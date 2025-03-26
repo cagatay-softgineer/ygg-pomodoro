@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register | Ygg</title>
+    <!-- Inline Tailwind configuration for dark mode -->
+    <script>
+      tailwind.config = {
+        darkMode: "class"
+      };
+    </script>
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="theme.css">
+  </head>
+  <body class="min-h-screen flex flex-col items-center justify-center bg-app text-app p-4">
+    <!-- Background overlay -->
+    <div class="absolute top-0 left-0 w-full h-full opacity-10 bg-repeat" style="background-image: url('placeholder.svg?height=300&width=300');"></div>
+
+    <!-- Header with logo and theme toggle -->
+    <div class="absolute top-8 left-0 w-full flex justify-between px-8">
+      <a href="index.html" class="flex items-center gap-2 text-app hover:text-app/80 transition-colors">
+        <img
+          src="https://raw.githubusercontent.com/Yggbranch/assets/refs/heads/main/Pomodoro/PNGs/PNG/Artboard%201%403x.png"
+          alt="Yggbranch Logo"
+          width="32"
+          height="32"
+          class="h-8 w-8"
+        />
+        <span class="text-xl font-bold">Ygg</span>
+      </a>
+      <!-- Theme Toggle Button -->
+      <!-- Theme Toggle Button (Centered Icons) -->
+      <button id="theme-toggle" class="relative flex items-center justify-center h-9 w-9 rounded-full bg-gray-100 text-gray-900 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700" aria-label="Toggle theme">
+        <!-- Sun Icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0">
+          <circle cx="12" cy="12" r="5" stroke-width="2"></circle>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+        </svg>
+        <!-- Moon Icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Main Card Container -->
+    <div class="relative z-10 w-full max-w-md">
+      <div class="absolute inset-0 bg-white/5 backdrop-blur-xl rounded-2xl"></div>
+      <div class="border-0 shadow-2xl bg-white/10 backdrop-blur-lg text-app p-6 rounded-2xl">
+        <div class="mb-4 text-center">
+          <h2 class="text-2xl font-bold">Create an Account</h2>
+          <p class="text-app/70">Join Ygg and boost your productivity today</p>
+        </div>
+        <!-- Error Alert -->
+        <div id="error-alert" class="mb-4 bg-red-500/20 text-white border-red-500 p-2 rounded flex items-center space-x-2" style="display: none;">
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M12 17a1 1 0 100-2 1 1 0 000 2zm0-11a9 9 0 110 18 9 9 0 010-18z"></path>
+          </svg>
+          <span id="error-description"></span>
+        </div>
+        <!-- Registration Form -->
+        <form id="register-form" class="space-y-4">
+          <div class="space-y-2">
+            <label for="email" class="text-app">Email</label>
+            <input
+              id="email"
+              type="email"
+              placeholder="name@example.com"
+              required
+              class="w-full bg-white/10 border border-white/20 text-app placeholder:text-app/50 focus:border-white focus:ring-white rounded px-3 py-2"
+            />
+          </div>
+          <div class="space-y-2">
+            <label for="password" class="text-app">Password</label>
+            <input
+              id="password"
+              type="password"
+              required
+              class="w-full bg-white/10 border border-white/20 text-app placeholder:text-app/50 focus:border-white focus:ring-white rounded px-3 py-2"
+            />
+            <!-- Password Strength Bars -->
+            <div id="password-strength-bars" class="mt-2 flex gap-1 mb-1"></div>
+            <!-- Password Criteria -->
+            <div class="grid grid-cols-2 gap-2 text-xs" id="password-criteria">
+              <div id="criteria-uppercase" class="flex items-center text-app/50">
+                <span class="w-3 mr-1"></span>Uppercase letter
+              </div>
+              <div id="criteria-number" class="flex items-center text-app/50">
+                <span class="w-3 mr-1"></span>Number
+              </div>
+              <div id="criteria-special" class="flex items-center text-app/50">
+                <span class="w-3 mr-1"></span>Special character
+              </div>
+              <div id="criteria-length" class="flex items-center text-app/50">
+                <span class="w-3 mr-1"></span>8+ characters
+              </div>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <label for="confirmPassword" class="text-app">Confirm Password</label>
+            <input
+              id="confirmPassword"
+              type="password"
+              required
+              class="w-full bg-white/10 border border-white/20 text-app placeholder:text-app/50 focus:border-white focus:ring-white rounded px-3 py-2"
+            />
+            <div id="confirm-password-match" class="text-xs mt-1 flex items-center"></div>
+          </div>
+          <button id="register-button" type="submit" class="w-full bg-white text-indigo-700 hover:bg-white/90 rounded px-3 py-2 transition-colors">
+            Register
+          </button>
+        </form>
+        <div class="mt-4 text-center text-sm text-app/70">
+          Already have an account?
+          <a href="login.html" class="text-app font-medium hover:underline transition-colors">Login</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-8 text-sm text-app/50 text-center">
+      By registering, you agree to our Terms of Service and Privacy Policy
+    </div>
+
+    <script>
+      // -------------------------------
+      // Theme Toggle Functionality
+      // -------------------------------
+      function initTheme() {
+        let theme = localStorage.getItem("theme");
+        if (!theme) {
+          theme = "light";
+          localStorage.setItem("theme", theme);
+        }
+        document.documentElement.classList.remove("light", "dark");
+        document.documentElement.classList.add(theme);
+      }
+      function toggleTheme() {
+        let theme = localStorage.getItem("theme") || "light";
+        theme = theme === "dark" ? "light" : "dark";
+        localStorage.setItem("theme", theme);
+        document.documentElement.classList.remove("light", "dark");
+        document.documentElement.classList.add(theme);
+      }
+      document.addEventListener("DOMContentLoaded", function () {
+        initTheme();
+        document.getElementById("theme-toggle").addEventListener("click", toggleTheme);
+      });
+    </script>
+
+    <script>
+      // -------------------------------
+      // Registration Form Handling
+      // -------------------------------
+      // Helper functions for icons
+      function getCheckIcon() {
+        return '<svg class="h-3 w-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
+      }
+      function getAlertIcon() {
+        return '<svg class="h-3 w-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M12 17a1 1 0 100-2 1 1 0 000 2zm0-11a9 9 0 110 18 9 9 0 010-18z"></path></svg>';
+      }
+
+      // Calculate password strength (0 to 4)
+      function getPasswordStrength(password) {
+        if (!password) return 0;
+        let strength = 0;
+        if (password.length >= 8) strength++;
+        if (/[A-Z]/.test(password)) strength++;
+        if (/[0-9]/.test(password)) strength++;
+        if (/[^A-Za-z0-9]/.test(password)) strength++;
+        return strength;
+      }
+
+      // Update password strength bars and criteria
+      function updatePasswordIndicators() {
+        const password = document.getElementById("password").value;
+        const strength = getPasswordStrength(password);
+        const strengthBarsContainer = document.getElementById("password-strength-bars");
+        strengthBarsContainer.innerHTML = "";
+        for (let i = 0; i < 4; i++) {
+          let barColor = "bg-white/20";
+          if (i < strength) {
+            const colors = ["bg-red-500", "bg-orange-500", "bg-yellow-500", "bg-green-500"];
+            barColor = colors[strength - 1] || "bg-green-500";
+          }
+          const bar = document.createElement("div");
+          bar.className = "h-1 flex-1 rounded-full " + barColor;
+          strengthBarsContainer.appendChild(bar);
+        }
+
+        // Update criteria checkmarks
+        const criteriaUppercase = document.getElementById("criteria-uppercase");
+        const criteriaNumber = document.getElementById("criteria-number");
+        const criteriaSpecial = document.getElementById("criteria-special");
+        const criteriaLength = document.getElementById("criteria-length");
+
+        // Uppercase letter
+        if (/[A-Z]/.test(password)) {
+          criteriaUppercase.classList.replace("text-app/50", "text-green-300");
+          criteriaUppercase.innerHTML = getCheckIcon() + "Uppercase letter";
+        } else {
+          criteriaUppercase.classList.replace("text-green-300", "text-app/50");
+          criteriaUppercase.innerHTML = '<span class="w-3 mr-1"></span>Uppercase letter';
+        }
+
+        // Number
+        if (/[0-9]/.test(password)) {
+          criteriaNumber.classList.replace("text-app/50", "text-green-300");
+          criteriaNumber.innerHTML = getCheckIcon() + "Number";
+        } else {
+          criteriaNumber.classList.replace("text-green-300", "text-app/50");
+          criteriaNumber.innerHTML = '<span class="w-3 mr-1"></span>Number';
+        }
+
+        // Special character
+        if (/[^A-Za-z0-9]/.test(password)) {
+          criteriaSpecial.classList.replace("text-app/50", "text-green-300");
+          criteriaSpecial.innerHTML = getCheckIcon() + "Special character";
+        } else {
+          criteriaSpecial.classList.replace("text-green-300", "text-app/50");
+          criteriaSpecial.innerHTML = '<span class="w-3 mr-1"></span>Special character';
+        }
+
+        // Length check
+        if (password.length >= 8) {
+          criteriaLength.classList.replace("text-app/50", "text-green-300");
+          criteriaLength.innerHTML = getCheckIcon() + "8+ characters";
+        } else {
+          criteriaLength.classList.replace("text-green-300", "text-app/50");
+          criteriaLength.innerHTML = '<span class="w-3 mr-1"></span>8+ characters';
+        }
+
+        updateConfirmPasswordIndicator();
+      }
+
+      // Update confirm password match indicator
+      function updateConfirmPasswordIndicator() {
+        const password = document.getElementById("password").value;
+        const confirmPassword = document.getElementById("confirmPassword").value;
+        const confirmMatchContainer = document.getElementById("confirm-password-match");
+        if (confirmPassword) {
+          if (password === confirmPassword) {
+            confirmMatchContainer.classList.replace("text-red-300", "text-green-300");
+            confirmMatchContainer.innerHTML = getCheckIcon() + "Passwords match";
+          } else {
+            confirmMatchContainer.classList.replace("text-green-300", "text-red-300");
+            confirmMatchContainer.innerHTML = getAlertIcon() + "Passwords don't match";
+          }
+        } else {
+          confirmMatchContainer.innerHTML = "";
+        }
+      }
+
+      // -------------------------------
+      // Event Listeners Setup
+      // -------------------------------
+      document.addEventListener("DOMContentLoaded", function () {
+        initTheme();
+        document.getElementById("theme-toggle").addEventListener("click", toggleTheme);
+
+        const registerForm = document.getElementById("register-form");
+        const registerButton = document.getElementById("register-button");
+        const errorAlert = document.getElementById("error-alert");
+        const errorDescription = document.getElementById("error-description");
+
+        document.getElementById("password").addEventListener("input", updatePasswordIndicators);
+        document.getElementById("confirmPassword").addEventListener("input", updateConfirmPasswordIndicator);
+
+        registerForm.addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const email = document.getElementById("email").value;
+          const password = document.getElementById("password").value;
+          const confirmPassword = document.getElementById("confirmPassword").value;
+          const strength = getPasswordStrength(password);
+
+          // Validate passwords match
+          if (password !== confirmPassword) {
+            errorDescription.textContent = "Passwords do not match";
+            errorAlert.style.display = "flex";
+            return;
+          }
+
+          // Validate password strength
+          if (strength < 3) {
+            errorDescription.textContent = "Please use a stronger password";
+            errorAlert.style.display = "flex";
+            return;
+          }
+
+          registerButton.disabled = true;
+          errorAlert.style.display = "none";
+          registerButton.innerHTML =
+            '<svg class="animate-spin inline-block mr-2 h-4 w-4" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Creating account...';
+
+          try {
+            const response = await fetch("https://python-hello-world-911611650068.europe-west3.run.app/auth/register", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ email, password })
+            });
+            const data = await response.json();
+            if (!response.ok) {
+              throw new Error(data.message || "Registration failed");
+            }
+            // Redirect on successful registration
+            window.location.href = "login.html?registered=true";
+          } catch (err) {
+            errorDescription.textContent = err.message;
+            errorAlert.style.display = "flex";
+          } finally {
+            registerButton.disabled = false;
+            registerButton.textContent = "Register";
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
