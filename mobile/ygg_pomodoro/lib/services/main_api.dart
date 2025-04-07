@@ -10,12 +10,24 @@ final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
 MainAPI mainAPI = MainAPI();
 String? baseUrl;
 
+// Define a cache entry to hold the data and expiry timestamp.
+class CacheEntry {
+  final Map<String, dynamic> data;
+  final DateTime expiry;
+  CacheEntry(this.data, this.expiry);
+}
+
 class MainAPI {
+
+  static final Map<String, CacheEntry> _playlistDurationCache = {};
+  
+  // Cache duration set to one hour.
+  static const Duration cacheDuration = Duration(hours: 1);
 
    // Create Dio without a base URL for now.
   final Dio _dio = Dio(BaseOptions(
-    connectTimeout: Duration(milliseconds: 5000),
-    receiveTimeout: Duration(milliseconds: 10000),
+    connectTimeout: Duration(milliseconds: 20000),
+    receiveTimeout: Duration(milliseconds: 40000),
   ));
 
   // List of candidate base URLs.
@@ -197,6 +209,9 @@ class MainAPI {
       case MusicApp.YouTube:
         endpoint = 'youtube-music/playlists';
         break;
+      case MusicApp.Apple:
+        endpoint = 'apple-music/playlists';
+        break;
     }
 
     final response = await _dio.post(
@@ -204,28 +219,37 @@ class MainAPI {
       data: {
         "user_email": userId,
       },
+      options: Options(sendTimeout: Duration(milliseconds: 20000),
+      receiveTimeout: Duration(milliseconds: 60000),
+      ),
     );
 
-    if (response.statusCode == 200) {
-      List<dynamic> data;
+if (response.statusCode == 200) {
+    List<dynamic> data;
+    if (app == MusicApp.YouTube) {
       // For YouTube, assume the response JSON contains an "items" array.
-      if (app == MusicApp.YouTube) {
-        data = response.data["items"] ?? [];
-      } else {
-        data = response.data;
-      }
-      return data.map((json) => Playlist.fromJson(json, app)).toList();
+      data = response.data["items"] ?? [];
+    } else if (response.data is List) {
+      // If the response is directly a List.
+      data = response.data;
+    } else if (response.data is Map && response.data["data"] is List) {
+      // If the response is a Map with a "data" key holding the list.
+      data = response.data["data"];
     } else {
-      throw Exception('Failed to load playlists');
+      data = [];
     }
+    return data.map((json) => Playlist.fromJson(json, app)).toList();
+  } else {
+    throw Exception('Failed to load playlists');
   }
+}
 
   Future<List<Track>> fetchPlaylistTracks(String? userEmail, String? playlistId) async {
     const endpoint = 'youtube-music/playlist_tracks';
     final response = await _dio.post(
       endpoint,
       data: {
-        "user_email": userEmail,
+        "user_id": userEmail,
         "playlist_id": playlistId,
       },
     );
@@ -244,7 +268,7 @@ class MainAPI {
     try {
       final response = await _dio.post(
         "/youtube-music/fetch_first_video_id",
-        data: {"playlist_id": playlistId, "user_email": userId},
+        data: {"playlist_id": playlistId, "user_id": userId},
         options: Options(
         contentType: "application/json", // Sets "application/json"
         ),
@@ -275,44 +299,78 @@ class MainAPI {
     }
   }
 
-  Future<Map<String, dynamic>> getPlaylistDuration(String? playlistId, String? userId) async {
-    try {
-    print("$playlistId");
-    final response = await _dio.post(
-          'https://api-sync-branch.yggbranch.dev/spotify-micro-service/playlist_duration',
-          data: {
-            "playlist_id": "$playlistId",
-            "user_id": "$userId"
-          }
-    );
+
+  Future<Map<String, dynamic>> getPlaylistDuration(String? playlistId, MusicApp? app, int? playlistTrackCount) async {
+    if (playlistId == null) {
+      throw Exception("Playlist ID cannot be null");
+    }
+    if (playlistTrackCount! >= 100){
+      throw Exception("Playlist track count is greater than 100");
+    }
+    // Check if the duration is cached and still valid.
+    if (_playlistDurationCache.containsKey(playlistId)) {
+      final cacheEntry = _playlistDurationCache[playlistId]!;
+      if (DateTime.now().isBefore(cacheEntry.expiry)) {
+        return cacheEntry.data;
+      } else {
+        // Remove expired cache entry.
+        _playlistDurationCache.remove(playlistId);
+      }
+    }
   
-    if (response.data is Map<String, dynamic>) {
-          return response.data;
-        } else {
-          throw Exception(
-              'Unexpected response type: ${response.data.runtimeType}');
-        }
-      } on DioException catch (e) {
-        if (e.type == DioExceptionType.connectionTimeout) {
-          return {
-            'error': true,
-            'message':
-                'Connection timed out. Please check your internet connection.',
-          };
-        } else if (e.type == DioExceptionType.receiveTimeout) {
-          return {
-            'error': true,
-            'message': 'Server took too long to respond. Please try again later.',
-          };
-        } else if (e.response != null) {
-          return {
-            'error': true,
-            'message': e.response?.data['message'] ?? 'Login failed',
-          };
-        } else {
-          return {
-            'error': true,
-            'message': 'An unexpected error occurred. Please try again.',
+    try {
+      final userId = await AuthService.getUserId();
+      print("User ID: $userId");
+      String endpoint = "";
+      if(app == MusicApp.Spotify) {
+        endpoint = "spotify-micro-service/playlist_duration";
+      }
+      if(app == MusicApp.YouTube) {
+        endpoint = "youtube-music/playlist_duration";
+      }
+      if(app == MusicApp.Apple) {
+        endpoint = "apple-music/playlist_duration";
+      }
+      final response = await _dio.post(
+        '${endpoint}',
+        data: {
+          "playlist_id": "$playlistId",
+          "user_id": "$userId"
+        },
+        options: Options(sendTimeout: Duration(milliseconds: 20000),
+        receiveTimeout: Duration(milliseconds: 60000),
+        ),
+      );
+      if (response.data is Map<String, dynamic>) {
+        // Cache the response for one hour.
+        _playlistDurationCache[playlistId] = CacheEntry(
+          response.data,
+          DateTime.now().add(cacheDuration),
+        );
+        return response.data;
+      } else {
+        throw Exception('Unexpected response type: ${response.data.runtimeType}');
+      }
+    } on DioException catch (e) {
+      if (e.type == DioExceptionType.connectionTimeout) {
+        return {
+          'error': true,
+          'message': 'Connection timed out. Please check your internet connection.',
+        };
+      } else if (e.type == DioExceptionType.receiveTimeout) {
+        return {
+          'error': true,
+          'message': 'Server took too long to respond. Please try again later.',
+        };
+      } else if (e.response != null) {
+        return {
+          'error': true,
+          'message': e.response?.data['message'] ?? 'Login failed',
+        };
+      } else {
+        return {
+          'error': true,
+          'message': 'An unexpected error occurred. Please try again.',
         };
       }
     }
@@ -451,7 +509,58 @@ class MainAPI {
       };
     }
   }
-    
+  
+  Future<Map<String, dynamic>> getAllAppsBinding(String? email) async {
+    try {
+      final response = await _dio.post(
+        'apps/get_all_apps_binding',
+        data: {
+          'user_email': email,
+        },
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        ),
+      );
+  
+      if (response.data is Map<String, dynamic>) {
+        return response.data;
+      } else {
+        throw Exception(
+            'Unexpected response type: ${response.data.runtimeType}');
+      }
+    } on DioException catch (e) {
+      if (e.type == DioExceptionType.connectionTimeout) {
+        return {
+          'error': true,
+          'message': 'Connection timed out. Please check your internet connection.',
+        };
+      } else if (e.type == DioExceptionType.receiveTimeout) {
+        return {
+          'error': true,
+          'message': 'Server took too long to respond. Please try again later.',
+        };
+      } else if (e.response != null &&
+          e.response!.data is Map<String, dynamic>) {
+        return {
+          'error': true,
+          'message': e.response!.data['message'] ?? 'Fetching apps binding failed',
+        };
+      } else {
+        return {
+          'error': true,
+          'message': 'An unexpected error occurred. Please try again.',
+        };
+      }
+    } catch (e) {
+      return {
+        'error': true,
+        'message': 'An unexpected error occurred. Please try again.',
+      };
+    }
+  }
+
   Future<void> openSpotifyLogin(BuildContext context) async {
     try {
       // Fetch user ID
@@ -508,7 +617,38 @@ class MainAPI {
       // Optionally show an error message to the user
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Could not launch the URL.'),
+          content: Text('Could not launch the URL.\n ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+    Future<void> openAppleLogin(BuildContext context) async {
+    try {
+      // Fetch user ID
+      final userId = await AuthService.getUserId();
+
+      // Debugging to ensure userId is valid
+      if (userId == null || userId.isEmpty) {
+        //print('Error: User ID is null or empty.');
+        throw 'User ID is null or empty.';
+      }
+
+      // Construct URL
+      final url = '${baseUrl}apple/login/$userId';
+      //print('Generated URL: $url');
+
+      // Check if the URL can be launched
+      await launch(url);
+      //print('URL launched successfully: $url');
+    } catch (e) {
+      // Log errors for debugging
+      //print('Error in openSpotifyLogin: $e');
+
+      // Optionally show an error message to the user
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Could not launch the URL.\n ${e.toString()}'),
           backgroundColor: Colors.red,
         ),
       );
