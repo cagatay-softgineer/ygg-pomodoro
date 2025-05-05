@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ygg_pomodoro/enums/enums.dart';
+
 /// Contains default icon properties for playlist sources and a helper
 /// method to get the default icon by app type.
 class AppIcons {

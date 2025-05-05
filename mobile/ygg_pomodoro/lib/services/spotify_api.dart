@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:ssdk_rsrc/services/main_api.dart';
+import 'package:ygg_pomodoro/services/main_api.dart';
 
 class SpotifyAPI {
     

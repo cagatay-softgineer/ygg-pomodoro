@@ -1,27 +1,40 @@
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import create_access_token, jwt_required  # noqa: F401
+from flask_jwt_extended import jwt_required
 from flask_limiter import Limiter
 from flask_cors import CORS
 from flask_limiter.util import get_remote_address
 from util.spotify import get_current_user_profile
 from Blueprints.google_api import get_google_profile
-from util.models import LinkedAppRequest  # Import the model
+from util.models import LinkedAppRequest, UserEmailRequest  # Import the model
 from util.logit import get_logger
 from util.utils import get_email_username
 import database.firebase_operations as firebase_operations
 from pydantic import ValidationError
 from config.config import settings
+from util.authlib import requires_scope
 
-apps_bp = Blueprint('apps', __name__)
+apps_bp = Blueprint("apps", __name__)
 limiter = Limiter(key_func=get_remote_address)
 
-OAUTHLIB_INSECURE_TRANSPORT=1
+OAUTHLIB_INSECURE_TRANSPORT = 1
 GOOGLE_CLIENT_SECRETS_FILE = settings.google_client_secret
 
 # Enable CORS for all routes in this blueprint
-CORS(apps_bp, resources={r"/*": {"origins": "*"}})
+CORS(apps_bp, resources=settings.CORS_resource_allow_all)
 
-logger = get_logger("logs/app_link.log", "Apps")
+logger = get_logger("logs", "Apps")
+
+
+@apps_bp.before_request
+def log_apps_requests():
+    logger.info("Apps blueprint request received.")
+
+
+@apps_bp.route("/healthcheck", methods=["GET"])
+def apps_healthcheck():
+    logger.info("Apps Service healthcheck requested")
+    return jsonify({"status": "ok", "service": "Apps Service"}), 200
+
 
 APP_ALIAS_TO_ID = {
     "Spotify": 1,
@@ -29,6 +42,7 @@ APP_ALIAS_TO_ID = {
     "YoutubeMusic": 3,
     "Google API": 4,
 }
+
 
 def get_app_id_by_alias(alias: str) -> int:
     """
@@ -50,8 +64,6 @@ def get_app_id_by_alias(alias: str) -> int:
     return app_id
 
 
-
-
 def get_app_name_by_alias(app_id: int) -> str:
     """
     Retrieves the application name based on the given application ID.
@@ -71,7 +83,10 @@ def get_app_name_by_alias(app_id: int) -> str:
             return alias
     raise ValueError(f"App ID '{app_id}' not found.")
 
-@apps_bp.route('/check_linked_app', methods=['POST'])
+
+@apps_bp.route("/check_linked_app", methods=["POST"])
+@jwt_required()
+@requires_scope("apps")
 def check_linked_app():
     """
     This function checks if a user is linked to a specific application and retrieves the user's profile.
@@ -90,7 +105,7 @@ def check_linked_app():
     try:
         payload = LinkedAppRequest.parse_obj(request.get_json())
     except ValidationError as ve:
-        return jsonify({"error": ve.errors()}), 400 
+        return jsonify({"error": ve.errors()}), 400
 
     # Use validated data
     app_name = payload.app_name
@@ -98,27 +113,37 @@ def check_linked_app():
 
     user_id = firebase_operations.get_user_id_by_email(user_email)
     app_id = firebase_operations.get_app_id_by_name(app_name)
-    #print(app_id, user_id, app_name, user_email)
+    # print(app_id, user_id, app_name, user_email)
 
     if not app_name or not user_email:
-        return jsonify({
-            "error": "All required fields must be provided.",
-            "user_linked": False,
-            "user_profile": None
-        }), 400
+        return (
+            jsonify(
+                {
+                    "error": "All required fields must be provided.",
+                    "user_linked": False,
+                    "user_profile": None,
+                }
+            ),
+            400,
+        )
 
     if not app_id or not user_id:
-        return jsonify({
-            "error": "Missing application or user identifier. This may indicate that the user is not linked, does not exist, or the application is unrecognized.",
-            "user_linked": False,
-            "user_profile": None
-        }), 400
-
+        return (
+            jsonify(
+                {
+                    "error": "Missing application or user identifier. This may indicate that the user is not linked, does not exist, or the application is unrecognized.",
+                    "user_linked": False,
+                    "user_profile": None,
+                }
+            ),
+            400,
+        )
+    access_tokens = False
     response = firebase_operations.get_userlinkedapps_tokens(user_id, app_id)
-
-    access_tokens = response[0]["access_token"]
+    if response and response[0]:
+        access_tokens = response[0]["access_token"]
     user_linked = response is not None
-    #print("User access_tokens", access_tokens)
+    # print("User access_tokens", access_tokens)
     if access_tokens:
         access_token = access_tokens[0]
 
@@ -128,49 +153,64 @@ def check_linked_app():
 
             if linked_app == "Spotify":
 
-                user_profile = get_current_user_profile(access_token, user_id, app_id)
-                return jsonify({
-                    "user_linked": True,
-                    "user_profile": user_profile
-                }), 200
+                user_profile = get_current_user_profile(
+                    access_token, user_id, app_id)
+                return jsonify(
+                    {"user_linked": True, "user_profile": user_profile}), 200
 
             elif linked_app == "AppleMusic":
-                return jsonify({
-                    "user_linked": True,
-                    "user_profile": "Apple Music Not Implementated"
-                }), 200
+                return (
+                    jsonify(
+                        {
+                            "user_linked": True,
+                            "user_profile": "Apple Music Not Implementated",
+                        }
+                    ),
+                    200,
+                )
             elif linked_app == "YoutubeMusic":
                 user_profile = get_google_profile(user_email)
-                return jsonify({
-                    "user_linked": True,
-                    "user_profile": user_profile
-                }), 200    
+                return jsonify(
+                    {"user_linked": True, "user_profile": user_profile}), 200
             elif linked_app == "Google API":
-                return jsonify({
-                    "user_linked": True,
-                    "user_profile": "Google API Not Implementated"
-                }), 200
+                return (
+                    jsonify(
+                        {
+                            "user_linked": True,
+                            "user_profile": "Google API Not Implementated",
+                        }
+                    ),
+                    200,
+                )
             else:
-                return jsonify({
-                    "error": "Unknown application",
-                    "user_linked": False,
-                    "user_profile": None
-                }), 400
+                return (
+                    jsonify(
+                        {
+                            "error": "Unknown application",
+                            "user_linked": False,
+                            "user_profile": None,
+                        }
+                    ),
+                    400,
+                )
+
+        return jsonify({"user_linked": False, "user_profile": None}), 200
+
+    return (
+        jsonify(
+            {
+                "error": "Unable to verify user linkage; the user is either not linked or not found.",
+                "user_linked": False,
+                "user_profile": None,
+            }
+        ),
+        404,
+    )
 
 
-        return jsonify({
-            "user_linked": False,
-            "user_profile": None
-        }), 200
-
-    return jsonify({
-        "error": "Unable to verify user linkage; the user is either not linked or not found.",
-        "user_linked": False,
-        "user_profile": None
-    }), 404
-
-
-@apps_bp.route('/unlink_app', methods=['POST'])
+@apps_bp.route("/unlink_app", methods=["POST"])
+@jwt_required()
+@requires_scope("apps")
 def unlink_app():
     """
     Unlinks a user from a specific application.
@@ -208,7 +248,9 @@ def unlink_app():
     return jsonify({"message": "App Unlinked!"}), 201
 
 
-@apps_bp.route('/get_all_apps_binding', methods=['POST'])
+@apps_bp.route("/get_all_apps_binding", methods=["POST"])
+@jwt_required()
+@requires_scope("apps")
 def get_all_apps_binding():
     """
     Retrieves the binding state for all available applications for a given user.
@@ -218,7 +260,7 @@ def get_all_apps_binding():
 
     Returns a JSON response containing the user's email and a list of applications,
     each with its name, binding state (true/false), and user profile data if linked.
-    
+
     Example Response:
     {
         "user_email": "user@example.com",
@@ -238,13 +280,10 @@ def get_all_apps_binding():
     }
     """
     try:
-        # Validate and extract the JSON payload
-        data = request.get_json()
-        user_email = data.get("user_email")
-        if not user_email:
-            return jsonify({"error": "User email is required."}), 400
-    except Exception:
-        return jsonify({"error": "Invalid JSON payload."}), 400
+        payload = UserEmailRequest.parse_obj(request.get_json())
+    except ValidationError as ve:
+        return jsonify({"error": ve.errors()}), 400
+    user_email = payload.user_email
 
     # Retrieve user ID using Firebase operations
     user_id = firebase_operations.get_user_id_by_email(user_email)
@@ -254,34 +293,33 @@ def get_all_apps_binding():
     apps_status = []
     # Iterate over all configured applications
     for app_name, app_id in APP_ALIAS_TO_ID.items():
-        response = firebase_operations.get_userlinkedapps_tokens(user_id, app_id)
+        response = firebase_operations.get_userlinkedapps_tokens(
+            user_id, app_id)
         # Check if the response exists and contains access tokens
         if response and response[0].get("access_token"):
             tokens = response[0]["access_token"]
             # Depending on the application, retrieve the user profile if linked
             if app_name == "Spotify":
-                user_profile = get_current_user_profile(tokens[0], user_id, app_id)
+                user_profile = get_current_user_profile(
+                    tokens[0], user_id, app_id)
             elif app_name == "AppleMusic":
-                user_profile = {"name" : get_email_username(user_email)}
+                user_profile = {"name": get_email_username(user_email)}
             elif app_name == "YoutubeMusic":
                 user_profile = get_google_profile(user_email)
             elif app_name == "Google API":
                 user_profile = "Google API Not Implementated"
             else:
                 user_profile = None
-            apps_status.append({
-                "app_name": app_name,
-                "user_linked": True,
-                "user_profile": user_profile
-            })
+            apps_status.append(
+                {
+                    "app_name": app_name,
+                    "user_linked": True,
+                    "user_profile": user_profile,
+                }
+            )
         else:
-            apps_status.append({
-                "app_name": app_name,
-                "user_linked": False,
-                "user_profile": None
-            })
+            apps_status.append(
+                {"app_name": app_name, "user_linked": False, "user_profile": None}
+            )
 
-    return jsonify({
-        "user_email": user_email,
-        "apps": apps_status
-    }), 200
+    return jsonify({"user_email": user_email, "apps": apps_status}), 200

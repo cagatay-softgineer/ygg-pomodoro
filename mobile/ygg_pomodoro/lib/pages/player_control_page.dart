@@ -1,15 +1,15 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:ssdk_rsrc/constants/default/apple_playlist.dart';
-import 'package:ssdk_rsrc/constants/default/spotify_playlist.dart';
-import 'package:ssdk_rsrc/models/playlist.dart';
-import 'package:ssdk_rsrc/models/music_player.dart'; // Contains MusicPlayerWidget and Track model
-import 'package:ssdk_rsrc/services/main_api.dart';
-import 'package:ssdk_rsrc/utils/authlib.dart';
-import 'package:ssdk_rsrc/enums/enums.dart';
-import 'package:ssdk_rsrc/constants/default/app_icons.dart';
-import 'package:ssdk_rsrc/constants/default/youtube_playlist.dart';
+import 'package:ygg_pomodoro/constants/default/apple_playlist.dart';
+import 'package:ygg_pomodoro/constants/default/spotify_playlist.dart';
+import 'package:ygg_pomodoro/models/playlist.dart';
+import 'package:ygg_pomodoro/models/music_player.dart'; // Contains MusicPlayerWidget and Track model
+import 'package:ygg_pomodoro/services/main_api.dart';
+import 'package:ygg_pomodoro/utils/authlib.dart';
+import 'package:ygg_pomodoro/enums/enums.dart';
+import 'package:ygg_pomodoro/constants/default/app_icons.dart';
+import 'package:ygg_pomodoro/constants/default/youtube_playlist.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 /// A service class that communicates with the native Apple Music SDK via a MethodChannel.

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:ygg_pomodoro/services/main_api.dart';
 import 'package:ygg_pomodoro/widgets/adaptive_widgets/appbar.dart';
 import 'package:ygg_pomodoro/widgets/adaptive_widgets/buttons.dart';
 import 'package:ygg_pomodoro/widgets/adaptive_widgets/icons.dart';
 import 'package:ygg_pomodoro/utils/authlib.dart';
 import 'package:ygg_pomodoro/widgets/custom_button.dart'; // Ensure the correct path
 import 'package:ygg_pomodoro/styles/button_styles.dart';
-import 'package:ygg_pomodoro/services/main_api.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -67,6 +68,15 @@ class _HomePageState extends State<HomePage> {
           children: [
             SizedBox(height: 20), // Adds space from the top
             // CustomButton to Navigate to Button Customizer
+           CustomButton(
+             text: "Navigate To\nButton Customizer",
+             onPressed: () {
+               Navigator.pushNamed(context, '/button_customizer');
+             },
+             buttonParams: navigateButtonParams,
+           ),
+            SizedBox(height: 20), // Adds vertical spacing
+            // CustomButton for Logout
             CustomButton(
               text: "Logout",
               onPressed: () {
@@ -76,6 +86,65 @@ class _HomePageState extends State<HomePage> {
             ),
             SizedBox(height: 20), // Adds vertical spacing
             // CustomButton for Logout
+            CustomButton(
+              text: "Linked Apps",
+              onPressed: () {
+                // Implement your logout logic here
+                // For example, navigate back to the login page
+                Navigator.pushNamed(
+                    context, '/applinks');
+              },
+              buttonParams: linkedAppsButtonParams,
+            ),
+            SizedBox(height: 20), // Adds vertical spacing
+            // CustomButton for Logout
+            CustomButton(
+              text: "Playlists",
+              onPressed: () {
+                // Implement your logout logic here
+                // For example, navigate back to the login page
+                Navigator.pushNamed(
+                    context, '/playlists');
+              },
+              buttonParams: playlistButtonParams,
+            ),
+            SizedBox(height: 20), // Adds vertical spacing
+            // CustomButton for Logout
+            CustomButton(
+              text: "Player",
+              onPressed: () {
+                // Implement your logout logic here
+                // For example, navigate back to the login page
+                Navigator.pushNamed(
+                    context, '/player');
+              },
+              buttonParams: playerButtonParams,
+            ),
+            SizedBox(height: 20), // Adds vertical spacing
+            // CustomButton for Logout
+            CustomButton(
+              text: "Timer",
+              onPressed: () {
+                // Implement your logout logic here
+                // For example, navigate back to the login page
+                Navigator.pushNamed(
+                    context, '/timer');
+              },
+              buttonParams: timerButtonParams,
+            ),
+            SizedBox(height: 20), // Adds vertical spacing
+            // CustomButton for Logout
+            CustomButton(
+              text: "Custom Timer",
+              onPressed: () {
+                // Implement your logout logic here
+                // For example, navigate back to the login page
+                Navigator.pushNamed(
+                    context, '/custom_timer');
+              },
+              buttonParams: timerButtonParams,
+            ),
+            SizedBox(height: 20), // Adds vertical spacing
             AdaptiveButton(
               child: Icon(AdaptiveIcons.home),
               onPressed: () async {

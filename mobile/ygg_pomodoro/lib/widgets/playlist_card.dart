@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:ssdk_rsrc/models/playlist.dart';
-import 'package:ssdk_rsrc/services/main_api.dart';
-import 'package:ssdk_rsrc/widgets/custom_button.dart';
-import 'package:ssdk_rsrc/constants/default/app_icons.dart';
-import 'package:ssdk_rsrc/styles/button_styles.dart';
+import 'package:ygg_pomodoro/models/playlist.dart';
+import 'package:ygg_pomodoro/services/main_api.dart';
+import 'package:ygg_pomodoro/widgets/custom_button.dart';
+import 'package:ygg_pomodoro/constants/default/app_icons.dart';
+import 'package:ygg_pomodoro/styles/button_styles.dart';
 
 class PlaylistCard extends StatelessWidget {
   final Playlist playlist;

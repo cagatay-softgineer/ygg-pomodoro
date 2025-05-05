@@ -1,12 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:ssdk_rsrc/pages/player_control_page.dart';
-import 'package:ssdk_rsrc/services/main_api.dart';
-import 'package:ssdk_rsrc/widgets/playlist_card.dart';
-import 'package:ssdk_rsrc/utils/authlib.dart';
-import 'package:ssdk_rsrc/models/playlist.dart';
-import 'package:ssdk_rsrc/constants/default/user.dart';
-import 'package:ssdk_rsrc/enums/enums.dart';
+import 'package:ygg_pomodoro/pages/player_control_page.dart';
+import 'package:ygg_pomodoro/services/main_api.dart';
+import 'package:ygg_pomodoro/widgets/playlist_card.dart';
+import 'package:ygg_pomodoro/utils/authlib.dart';
+import 'package:ygg_pomodoro/models/playlist.dart';
+import 'package:ygg_pomodoro/constants/default/user.dart';
+import 'package:ygg_pomodoro/enums/enums.dart';
 
 class PlaylistPage extends StatefulWidget {
   const PlaylistPage({super.key});

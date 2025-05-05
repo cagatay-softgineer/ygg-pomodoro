@@ -1,5 +1,5 @@
 enum MusicApp {
   Spotify,
   YouTube,
-  Apple
+  Apple,
 }

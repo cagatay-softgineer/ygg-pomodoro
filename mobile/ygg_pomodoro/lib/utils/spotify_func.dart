@@ -1,5 +1,5 @@
-import 'package:ssdk_rsrc/models/playlist.dart';
-import 'package:ssdk_rsrc/services/spotify_api.dart';
+import 'package:ygg_pomodoro/models/playlist.dart';
+import 'package:ygg_pomodoro/services/spotify_api.dart';
 
 class SpotifyPlayerController {
   final SpotifyAPI spotifyAPI;
