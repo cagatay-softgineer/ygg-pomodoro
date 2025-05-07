@@ -1,118 +1,241 @@
+/*─────────────────────────────────────────────────────────────────────────
+  Theme Variables
+─────────────────────────────────────────────────────────────────────────*/
 :root {
-    /* Theme variables */
-    --background: 0 0% 100%;             /* white */
-    --foreground: 222.2 84% 4.9%;        /* dark text */
-    --primary: 155 40% 50%;              /* green/spotify-like */
-    --primary-foreground: 210 40% 98%;   /* light text on primary */
-    --accent: 210 40% 96.1%;            /* light accent */
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --radius: 0.5rem;
-    --shadow-color: rgba(0, 0, 0, 0.1);
-  }
-  
-  /* Dark theme overrides */
-  .dark {
-    --background: 222.2 84% 4.9%;        /* dark background */
-    --foreground: 210 40% 98%;           /* light text */
-    --primary: 12 100% 47%;              /* bright accent in dark */
-    --primary-foreground: 210 40% 98%;   /* light on primary */
-    --accent: 217.2 32.6% 17.5%;         /* dark accent */
-    --accent-foreground: 210 40% 98%;    /* light text */
-  }
-  
-  /* Reset and base styles */
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: Montserrat, sans-serif;
-  }
-  
-  body {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
-    line-height: 1.5;
-    min-height: 100vh;
-  }
-  
-  a { color: hsl(var(--primary)); text-decoration: none; }
-  
-  .container {
-    max-width: 400px;
-    margin: 3rem auto;
-    padding: 1rem;
-    background-color: hsl(var(--background));
-    border-radius: var(--radius);
-    box-shadow: 0 2px 8px var(--shadow-color);
-  }
-  
-  h1 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-    text-align: center;
-    color: hsl(var(--foreground));
-  }
-  
-  input,
-  select {
-    width: 100%;
-    padding: 0.75rem;
-    margin: 0.5rem 0;
-    border: 1px solid hsl(var(--accent));
-    border-radius: var(--radius);
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
-  }
-  
-  button {
-    width: 100%;
-    padding: 0.75rem;
-    margin: 0.5rem 0;
-    border: none;
-    border-radius: var(--radius);
-    background-color: hsl(var(--primary));
-    color: hsl(var(--primary-foreground));
-    cursor: pointer;
-  }
-  
-  button.secondary {
-    background-color: hsl(var(--accent));
-    color: hsl(var(--accent-foreground));
-  }
-  
-  nav {
-    text-align: center;
-    margin: 1rem 0;
-  }
-  
-  nav a {
-    margin: 0 0.5rem;
-    color: hsl(var(--primary));
-    font-weight: 500;
-  }
-  
-  .card {
-    display: flex;
-    align-items: center;
-    padding: 0.75rem;
-    margin: 0.5rem 0;
-    background-color: hsl(var(--accent));
-    color: hsl(var(--accent-foreground));
-    border-radius: var(--radius);
-    box-shadow: 0 1px 4px var(--shadow-color);
-  }
-  
-  .card img {
-    width: 60px;
-    height: 60px;
-    border-radius: var(--radius);
-    object-fit: cover;
-    margin-right: 1rem;
-  }
-  
-  /* Utility classes */
-  .bg-app       { background-color: hsl(var(--background)); }
-  .text-app     { color: hsl(var(--foreground)); }
-  .bg-primary   { background-color: hsl(var(--primary)); color: hsl(var(--primary-foreground)); }
-  .bg-accent    { background-color: hsl(var(--accent));  color: hsl(var(--accent-foreground)); }
-  .rounded-app  { border-radius: var(--radius); }
+  /* Light theme */
+  --bg: 0 0% 100%;
+  --fg: 222.2 84% 4.9%;
+  --primary: 155 40% 50%;
+  --primary-fg: 210 40% 98%;
+  --accent: 210 40% 96.1%;
+  --accent-fg: 222.2 47.4% 11.2%;
+
+  --radius: 0.5rem;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+
+  --transition-fast: 0.2s ease;
+  --transition-slow: 0.3s ease;
+}
+
+/* Dark theme overrides */
+.dark {
+  --bg: 222.2 84% 4.9%;
+  --fg: 210 40% 98%;
+  --primary: 12 100% 47%;
+  --primary-fg: 210 40% 98%;
+  --accent: 217.2 32.6% 17.5%;
+  --accent-fg: 210 40% 98%;
+}
+
+/*─────────────────────────────────────────────────────────────────────────
+  Base Reset & Typography
+─────────────────────────────────────────────────────────────────────────*/
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  font-family: Montserrat, sans-serif;
+  background-color: hsl(var(--bg));
+  color:            hsl(var(--fg));
+  line-height: 1.5;
+  min-height: 100vh;
+  transition: background-color var(--transition-slow),
+              color var(--transition-slow);
+}
+
+a {
+  color: hsl(var(--primary));
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+a:hover {
+  color: hsl(var(--primary) / 0.8);
+}
+
+/*─────────────────────────────────────────────────────────────────────────
+  Layout Containers
+─────────────────────────────────────────────────────────────────────────*/
+.container {
+  max-width: 400px;
+  margin: 3rem auto;
+  padding: 1rem;
+  background-color: hsl(var(--bg));
+  border-radius: var(--radius);
+  box-shadow: 0 2px 8px var(--shadow-color);
+  transition: box-shadow var(--transition-fast);
+}
+.container:hover {
+  box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+/*─────────────────────────────────────────────────────────────────────────
+  Navigation
+─────────────────────────────────────────────────────────────────────────*/
+nav {
+  text-align: center;
+  margin: 1rem 0;
+}
+nav a {
+  margin: 0 0.5rem;
+  font-weight: 500;
+}
+#theme-toggle {
+  margin-left: 1rem;
+  font-size: 0.9rem;
+}
+
+/*─────────────────────────────────────────────────────────────────────────
+  Forms & Inputs
+─────────────────────────────────────────────────────────────────────────*/
+input,
+select,
+button:not(.play-btn) {
+  width: 100%;
+  padding: 0.75rem;
+  margin: 0.5rem 0;
+  border: 1px solid hsl(var(--accent));
+  border-radius: var(--radius);
+  background-color: hsl(var(--bg));
+  color:            hsl(var(--fg));
+  font-size: 1rem;
+  transition: border-color var(--transition-fast),
+              background-color var(--transition-fast);
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: hsl(var(--primary));
+}
+
+/*─────────────────────────────────────────────────────────────────────────
+  Buttons
+─────────────────────────────────────────────────────────────────────────*/
+button:not(.play-btn) {
+  border: none;
+  background-color: hsl(var(--primary));
+  color:            hsl(var(--primary-fg));
+  cursor: pointer;
+  transition: background-color var(--transition-fast),
+              transform var(--transition-fast);
+}
+button:not(.play-btn):hover {
+  background-color: hsl(var(--primary) / 0.9);
+}
+button:not(.play-btn):active {
+  transform: scale(0.98);
+}
+
+button.secondary:not(.play-btn) {
+  background-color: hsl(var(--accent));
+  color:            hsl(var(--accent-fg));
+}
+
+/*─────────────────────────────────────────────────────────────────────────
+  Card Component
+─────────────────────────────────────────────────────────────────────────*/
+.card {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  margin: 0.75rem 0;
+  background-color: hsl(var(--accent));
+  color:            hsl(var(--accent-fg));
+  border-radius:    var(--radius);
+  box-shadow:       0 2px 6px var(--shadow-color);
+  transition: transform var(--transition-fast),
+              box-shadow var(--transition-fast);
+}
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.card img {
+  flex-shrink: 0;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius);
+  object-fit: cover;
+  margin-right: 1rem;
+}
+
+.card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.card-content .title {
+  font-size: 1rem;
+  font-weight: 600;
+}
+.card-content .subtitle {
+  font-size: 0.875rem;
+  color: hsl(var(--fg) / 0.7);
+}
+
+.card-actions {
+  margin-left: auto;
+}
+
+/*─────────────────────────────────────────────────────────────────────────
+  Play Button
+─────────────────────────────────────────────────────────────────────────*/
+.play-btn {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background-color: hsl(var(--primary));
+  color:            hsl(var(--primary-fg));
+  border:           none;
+  border-radius:    var(--radius);
+  font-size:        0.9rem;
+  font-weight:      500;
+  cursor:           pointer;
+  transition: background-color var(--transition-fast),
+              transform var(--transition-fast);
+}
+.play-btn:hover {
+  background-color: hsl(var(--primary) / 0.85);
+}
+.play-btn:active {
+  transform: scale(0.97);
+}
+.play-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px hsl(var(--primary-fg));
+}
+
+/*─────────────────────────────────────────────────────────────────────────
+  Pomodoro Timer
+─────────────────────────────────────────────────────────────────────────*/
+#pomodoro {
+  text-align: center;
+  margin-top: 2rem;
+}
+#timer {
+  font-size: 2rem;
+  font-family: monospace;
+  margin-bottom: 1rem;
+}
+#pomodoro button {
+  width: auto;
+  margin: 0 0.5rem;
+}
+
+/*─────────────────────────────────────────────────────────────────────────
+  Utility Classes
+─────────────────────────────────────────────────────────────────────────*/
+.bg-app   { background-color: hsl(var(--bg));     }
+.text-app { color:             hsl(var(--fg));    }
+.rounded-app { border-radius: var(--radius);      }
+.shadow-app  { box-shadow:    0 2px 8px var(--shadow-color); }

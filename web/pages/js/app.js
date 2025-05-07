@@ -1,4 +1,37 @@
-const API_BASE = 'https://api-sync-branch.yggbranch.dev/';
+const API_DEVELOPMENT = 'https://api-sync-branch.yggbranch.dev/';
+const API_DEPLOYMENT  = 'https://python-hello-world-911611650068.europe-west3.run.app/';
+
+// default to deployment
+let API_BASE = API_DEPLOYMENT;
+
+// on load, test the development URL once and switch if healthy
+(async function pickApiBase() {
+  const probeUrl = API_DEVELOPMENT + 'healthcheck';
+  try {
+    const res = await fetch(probeUrl, {
+      method: 'GET',
+      mode:   'cors',
+      cache:  'no-cache',
+    });
+
+    if (res.ok) {
+      API_BASE = API_DEVELOPMENT;
+      console.log('✅ Development API is up — switched API_BASE to:', API_BASE);
+    } else {
+      console.warn(
+        '⚠️ Development API unhealthy (status', 
+        res.status + 
+        '); staying on deployment:', 
+        API_BASE
+      );
+    }
+  } catch (err) {
+    console.warn(
+      '⚠️ Could not reach Development API; staying on deployment:', 
+      err
+    );
+  }
+})();
 const DURATION_ENDPOINT = 'spotify-micro-service/playlist_duration';
 
 // utils
@@ -65,23 +98,48 @@ async function fetchPlaylistInfo(playlistId, userEmail) {
 // ► CHECK SPOTIFY LINK
 async function initSpotifyPage() {
   const user = getUserId();
-  if(!user) return location='index.html';
-  // GET link status
-  const res = await fetch(API_BASE + 'apps/check_linked_app', {
-    method:'POST',
-    headers:{'Content-Type':'application/json', ...authHeaders()},
-    body: JSON.stringify({app_name:'Spotify', user_email:user})
+  if (!user) return location = 'index.html';
+
+  // 1) fetch link status + profile
+  const res  = await fetch(API_BASE + 'apps/check_linked_app', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json', ...authHeaders()},
+    body: JSON.stringify({app_name:'Spotify', user_email: user})
   });
   const data = await res.json();
-  const btn = document.getElementById('link-btn');
-  if(data.user_linked==='true' || data.user_linked===true) {
-    btn.textContent='Unlink Spotify';
-    btn.onclick = unlinkSpotify;
+
+  // 2) set up the link/unlink button
+  const linkSection = document.getElementById('spotify-link-section');
+  const btn          = document.getElementById('link-btn');
+  if (data.user_linked) {
+    btn.textContent = 'Unlink Spotify';
+    btn.onclick     = unlinkSpotify;
   } else {
-    btn.textContent='Link Spotify';
-    btn.onclick = () => {
-      window.open(API_BASE + `spotify/login/${user}`, '_blank');
-    };
+    btn.textContent = 'Link Spotify';
+    btn.onclick     = () => window.open(API_BASE + `spotify/login/${user}`, '_blank');
+  }
+
+  // 3) render profile if linked
+  const profileDiv = document.getElementById('spotify-profile');
+  if (data.user_linked && data.user_profile) {
+    const p = data.user_profile;
+    const imgUrl = p.images?.[0]?.url || 'https://placehold.co/64x64';
+    profileDiv.innerHTML = `
+      <div class="card">
+        <img src="${imgUrl}" alt="Avatar of ${p.display_name}">
+        <div class="card-content">
+          <div class="title">${p.display_name}</div>
+          <div class="subtitle">${p.email}</div>
+          <div class="subtitle">Country: ${p.country}</div>
+          <div class="subtitle">Followers: ${p.followers.total.toLocaleString()}</div>
+          <a href="${p.external_urls.spotify}" target="_blank" class="subtitle" style="color:hsl(var(--primary));">
+            Open in Spotify
+          </a>
+        </div>
+      </div>
+    `;
+  } else {
+    profileDiv.innerHTML = '';
   }
 }
 
@@ -95,6 +153,29 @@ async function unlinkSpotify() {
   const data = await res.json();
   alert(data.message || 'Spotify unlinked');
   initSpotifyPage();
+}
+
+async function getSpotifyAccessToken() {
+  // your backend expects { user_email } in body + JWT in Authorization
+  const res = await fetch(API_BASE + 'spotify/token', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeaders()
+    },
+    body: JSON.stringify({ user_email: getUserId() })
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || `Token fetch failed (${res.status})`);
+  }
+
+  const { token } = await res.json();
+  if (!token) {
+    throw new Error('No token field in response');
+  }
+  return token;
 }
 
 // ► FETCH PLAYLISTS
@@ -142,19 +223,80 @@ async function initPlaylistsPage() {
     list.forEach((pl, i) => {
       const { dur, count } = infos[i];
       const card = document.createElement('div');
-      card.className = 'card rounded-app bg-accent';
+      card.className = 'card';  // uses the improved .card CSS
+    
       card.innerHTML = `
-        <img src="${pl.playlist_image || 'https://via.placeholder.com/60'}" alt="">
-        <div>
-          <strong>${pl.playlist_name}</strong><br>
-          <small>by ${pl.playlist_owner}</small><br>
-          ${count  ? `<small>Tracks: ${count}</small><br>` : ''}
-          ${dur    ? `<small>Duration: ${dur}</small>`   : ''}
+        <img
+          src="${pl.playlist_image || 'https://placehold.co/64x64'}"
+          alt="${pl.playlist_name} cover"
+        />
+    
+        <div class="card-content">
+          <div class="title">${pl.playlist_name}</div>
+          <div class="subtitle">by ${pl.playlist_owner}</div>
+          ${count ? `<div class="subtitle">Tracks: ${count}</div>` : ''}
+          ${dur   ? `<div class="subtitle">Duration: ${dur}</div>` : ''}
+        </div>
+    
+        <div class="card-actions">
+          <button class="play-btn" data-playlist-id="${pl.playlist_id}">
+            ▶ Play
+          </button>
         </div>
       `;
+    
       container.appendChild(card);
     });
+
+    // ► 4) Play butonlarına event listener ekle
+    document.getElementById('playlist-list')
+    .addEventListener('click', e => {
+      if (!e.target.matches('.play-btn')) return;
+      const pid = e.target.dataset.playlistId;
+      playPlaylist(pid).catch(err => alert('Playback error: ' + err.message));
+    });
   }
+
+// ► playPlaylist now uses your backend-fetched token
+async function playPlaylist(playlistId) {
+  // 1) get a fresh Spotify token from your backend
+  const token = await getSpotifyAccessToken();
+
+  // 2) call Spotify’s play endpoint
+  const res = await fetch('https://api.spotify.com/v1/me/player/play', {
+    method: 'PUT',
+    headers: {
+      'Authorization': 'Bearer ' + token,
+      'Content-Type':  'application/json'
+    },
+    body: JSON.stringify({
+      context_uri: `spotify:playlist:${playlistId}`,
+      offset:      { position: 0 },
+      position_ms: 0
+    })
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || `Play failed (${res.status})`);
+  }
+}
+
+// ► pausePlayback also uses your backend token
+async function pausePlayback() {
+  const token = await getSpotifyAccessToken();
+  const res = await fetch('https://api.spotify.com/v1/me/player/pause', {
+    method: 'PUT',
+    headers: {
+      'Authorization': 'Bearer ' + token
+    }
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || `Pause failed (${res.status})`);
+  }
+}
 
 // ► NAVIGATION guard
 function guard() {
@@ -182,3 +324,67 @@ window.addEventListener('DOMContentLoaded',()=>{
 document.getElementById('theme-toggle').addEventListener('click', () => {
     document.getElementById('app-body').classList.toggle('dark');
   });
+
+
+
+
+  const POMODORO_DURATION = 25 * 60;  // saniye
+  let pomodoroRemaining = POMODORO_DURATION;
+  let pomodoroInterval = null;
+  
+  // ► Zamanlayıcı UI güncelleme
+  function updateTimerUI() {
+    const m = String(Math.floor(pomodoroRemaining / 60)).padStart(2,'0');
+    const s = String(pomodoroRemaining % 60).padStart(2,'0');
+    document.getElementById('timer').textContent = `${m}:${s}`;
+  }
+  
+  // ► Başlat
+  document.getElementById('start-btn').addEventListener('click', () => {
+    if (pomodoroInterval) return; // zaten çalışıyor
+    // Eğer Spotify’dan seçili bir liste varsa, oynatın:
+    const activePlayBtn = document.querySelector('.play-btn.active');
+    if (activePlayBtn) playPlaylist(activePlayBtn.dataset.playlistId).catch(console.error);
+  
+    pomodoroInterval = setInterval(() => {
+      if (pomodoroRemaining <= 0) {
+        clearInterval(pomodoroInterval);
+        pomodoroInterval = null;
+        alert('Pomodoro tamamlandı!'); 
+        return;
+      }
+      pomodoroRemaining--;
+      updateTimerUI();
+    }, 1000);
+  });
+  
+  // ► Duraklat
+  document.getElementById('pause-btn').addEventListener('click', () => {
+    if (!pomodoroInterval) return;
+    clearInterval(pomodoroInterval);
+    pomodoroInterval = null;
+    // Spotify’ı da durdur:
+    pausePlayback().catch(console.error);
+  });
+  
+  // ► Sıfırla
+  document.getElementById('reset-btn').addEventListener('click', () => {
+    clearInterval(pomodoroInterval);
+    pomodoroInterval = null;
+    pomodoroRemaining = POMODORO_DURATION;
+    updateTimerUI();
+    pausePlayback().catch(console.error);
+  });
+  
+  // ► Spotify duraklatma fonksiyonu
+  async function pausePlayback() {
+    const token = getToken();
+    if (!token) throw new Error('Not authenticated');
+    await fetch('https://api.spotify.com/v1/me/player/pause', {
+      method: 'PUT',
+      headers: {'Authorization': 'Bearer ' + token}
+    });
+  }
+  
+  // ► DOMContentLoaded sonrası ilk UI güncellemesi
+  window.addEventListener('DOMContentLoaded', updateTimerUI);
