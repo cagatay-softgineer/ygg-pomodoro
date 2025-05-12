@@ -1,19 +1,34 @@
-<!DOCTYPE html><html><head>
-  <meta charset="UTF-8"><meta name="viewport" content="width=device-width">
-  <title>Register</title>
-  <link rel="stylesheet" href="css/style.css">
-</head><body id="app-body" class="bg-app text-app">
-  <button id="theme-toggle">Toggle Dark Mode</button>
-  <div class="container">
-    <h1>Create Account</h1>
-    <form id="register-form">
-      <input name="email"    type="email"    placeholder="Email">
-      <input name="password" type="password" placeholder="Password">
-      <button type="submit">Register</button>
-    </form>
-    <p style="text-align:center">
-      <a href="index.html">Back to Login</a>
-    </p>
-  </div>
-  <script src="js/app.js"></script>
-</body></html>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Register</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <script>
+      ;(function() {
+        // read saved theme
+        const theme = localStorage.getItem('theme');
+        if (theme === 'dark') {
+          // add class to root <html>
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
+  </head>
+  <body id="app-body" class="bg-app text-app">
+    <button id="theme-toggle">Toggle Dark Mode</button>
+    <div class="container">
+      <h1>Create Account</h1>
+      <form id="register-form">
+        <input name="email" type="email" placeholder="Email" />
+        <input name="password" type="password" placeholder="Password" />
+        <button type="submit">Register</button>
+      </form>
+      <p style="text-align: center">
+        <a href="/">Back to Login</a>
+      </p>
+    </div>
+    <script src="js/app.js"></script>
+  </body>
+</html>

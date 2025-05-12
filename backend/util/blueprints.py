@@ -4,8 +4,6 @@ from Blueprints.auth import auth_bp
 from Blueprints.utilx import util_bp
 from Blueprints.apps import apps_bp
 from Blueprints.spotify import spotify_bp
-from Blueprints.apple import apple_bp
-from Blueprints.apple_music import appleMusic_bp
 from Blueprints.user_profile import profile_bp
 from Blueprints.google_api import google_bp
 from Blueprints.spotify_micro_service import SpotifyMicroService_bp
@@ -32,8 +30,6 @@ def register_blueprints(app: Flask, testing=False):
     app.register_blueprint(lyrics_bp, url_prefix="/lyrics")
     app.register_blueprint(google_bp, url_prefix="/google")
     app.register_blueprint(youtubeMusic_bp, url_prefix="/youtube-music")
-    app.register_blueprint(apple_bp, url_prefix="/apple")
-    app.register_blueprint(appleMusic_bp, url_prefix="/apple-music")
     app.register_blueprint(
         swaggerui_blueprint,
         url_prefix=app.config["SWAGGER_URL"])

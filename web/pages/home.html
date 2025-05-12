@@ -1,19 +1,33 @@
-<!DOCTYPE html><html><head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width">
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
     <title>Home</title>
-    <link rel="stylesheet" href="css/style.css">
-  </head><body id="app-body" class="bg-app text-app">
-    <nav style="text-align:center; margin:1rem 0;">
+    <link rel="stylesheet" href="css/style.css" />
+    <script>
+      ;(function() {
+        // read saved theme
+        const theme = localStorage.getItem('theme');
+        if (theme === 'dark') {
+          // add class to root <html>
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
+  </head>
+  <body id="app-body" class="bg-app text-app">
+    <nav style="text-align: center; margin: 1rem 0">
       <a href="spotify.html">Spotify</a>
       <a href="playlists.html">Playlists</a>
-      <a href="index.html" class="secondary">Logout</a>
+      <a href="/" class="secondary">Logout</a>
       <button id="theme-toggle">Toggle Dark Mode</button>
     </nav>
     <div class="container">
       <h1>Welcome!</h1>
       <p>Select an option above.</p>
       <!-- Pomodoro Timer -->
-    <div id="pomodoro">
+      <div id="pomodoro">
         <h2>Pomodoro</h2>
         <div id="timer">25:00</div>
         <button id="start-btn">Başlat</button>
@@ -22,5 +36,5 @@
       </div>
     </div>
     <script src="js/app.js"></script>
-  </body></html>
-  
+  </body>
+</html>
