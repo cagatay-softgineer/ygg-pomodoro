@@ -1,34 +1,70 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width" />
-    <title>Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ygg Pomodoro — Welcome</title>
     <link rel="stylesheet" href="css/style.css" />
-    <script>
-      ;(function() {
-        // read saved theme
-        const theme = localStorage.getItem('theme');
-        if (theme === 'dark') {
-          // add class to root <html>
-          document.documentElement.classList.add('dark');
-        }
-      })();
-    </script>
   </head>
-  <body id="app-body" class="bg-app text-app">
-    <button id="theme-toggle">Toggle Dark Mode</button>
-    <div class="container">
-      <h1>Welcome Back</h1>
-      <form id="login-form">
-        <input name="email" type="email" placeholder="Email" />
-        <input name="password" type="password" placeholder="Password" />
-        <button type="submit">Login</button>
-      </form>
-      <p style="text-align: center">
-        <a href="register.html">Sign Up</a>
-      </p>
-    </div>
+  <body id="app-body" class="bg-app text-app" style="overflow: hidden;">
+    <!-- Navigation -->
+   <nav class="container nav-bar" style="text-align: center">
+        <a href="#" class="nav-logo">Ygg Pomodoro</a>
+        <button
+          id="theme-toggle"
+          class="theme-toggle-btn"
+          aria-label="Toggle theme"
+        >
+          <!-- moon = shown in light theme -->
+          <svg
+            class="icon moon-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z" />
+          </svg>
+          <!-- sun = shown in dark theme -->
+          <svg
+            class="icon sun-icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="5" />
+            <line x1="12" y1="1" x2="12" y2="3" />
+            <line x1="12" y1="21" x2="12" y2="23" />
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+            <line x1="1" y1="12" x2="3" y2="12" />
+            <line x1="21" y1="12" x2="23" y2="12" />
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+          </svg>
+        </button>
+    </nav>
+
+    <!-- Main: just login/register -->
+    <main class="form-container" style="text-align: center;">
+      <h1>Welcome to Ygg Pomodoro</h1>
+      <div class="landing-actions" style="margin-top: 2rem">
+        <a href="login.html" class="login">Log In</a>
+        <a href="register.html" class="register">Sign Up</a>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="landing-footer">
+      <p>&copy; 2025 Ygg Pomodoro. All rights reserved.</p>
+    </footer>
+
     <script src="js/app.js"></script>
+    <script src="js/pomodoro.js"></script>
   </body>
 </html>

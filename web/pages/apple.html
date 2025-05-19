@@ -3,15 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
-    <title>Your Playlists</title>
+    <title>Apple Music Playlists</title>
     <link rel="stylesheet" href="css/style.css" />
     <script>
-      ;(function() {
-        // read saved theme
-        const theme = localStorage.getItem('theme');
-        if (theme === 'dark') {
-          // add class to root <html>
-          document.documentElement.classList.add('dark');
+      (function () {
+        const theme = localStorage.getItem("theme");
+        if (theme === "dark") {
+          document.documentElement.classList.add("dark");
         }
       })();
     </script>
@@ -32,21 +30,20 @@
         <span id="cp-duration" class="cp-time">0:00</span>
       </div>
     </div>
-    <nav class="container nav-bar" style="text-align: center;">
+    <nav class="container nav-bar" style="text-align: center">
       <a href="home.html">Home</a>
       <a href="pomodoro.html">Pomodoro</a>
       <a href="apps.html">Apps</a>
       <a href="spotify.html">Spotify</a>
-      <a href="playlists.html" class="active">Spotify Playlists</a>
+      <a href="playlists.html">Spotify Playlists</a>
       <a href="youtube.html">YouTube Music</a>
-      <a href="apple.html">Apple Music</a>
+      <a href="apple.html" class="active">Apple Music</a>
       <a href="#" id="logout-link" class="secondary">Logout</a>
       <button
         id="theme-toggle"
         class="theme-toggle-btn"
         aria-label="Toggle theme"
       >
-        <!-- moon = shown in light theme -->
         <svg
           class="icon moon-icon"
           viewBox="0 0 24 24"
@@ -58,7 +55,6 @@
         >
           <path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z" />
         </svg>
-        <!-- sun = shown in dark theme -->
         <svg
           class="icon sun-icon"
           viewBox="0 0 24 24"
@@ -80,10 +76,13 @@
         </svg>
       </button>
     </nav>
+
     <div class="container">
-      <h1>Spotify Playlists</h1>
-      <div id="playlist-list"></div>
+      <h1>Apple Music Playlists</h1>
+      <div id="apple-playlist-list" class="grid gap-4"></div>
     </div>
+
+    <!-- then your app logic -->
     <script src="js/app.js"></script>
     <script src="js/pomodoro.js"></script>
   </body>

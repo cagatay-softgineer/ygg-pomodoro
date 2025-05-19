@@ -3,15 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
-    <title>Your Playlists</title>
+    <title>Pomodoro Timer</title>
     <link rel="stylesheet" href="css/style.css" />
     <script>
-      ;(function() {
+      (function () {
         // read saved theme
-        const theme = localStorage.getItem('theme');
-        if (theme === 'dark') {
+        const theme = localStorage.getItem("theme");
+        if (theme === "dark") {
           // add class to root <html>
-          document.documentElement.classList.add('dark');
+          document.documentElement.classList.add("dark");
         }
       })();
     </script>
@@ -32,12 +32,12 @@
         <span id="cp-duration" class="cp-time">0:00</span>
       </div>
     </div>
-    <nav class="container nav-bar" style="text-align: center;">
+    <nav class="container nav-bar" style="text-align: center">
       <a href="home.html">Home</a>
-      <a href="pomodoro.html">Pomodoro</a>
+      <a href="pomodoro.html" class="active">Pomodoro</a>
       <a href="apps.html">Apps</a>
       <a href="spotify.html">Spotify</a>
-      <a href="playlists.html" class="active">Spotify Playlists</a>
+      <a href="playlists.html">Spotify Playlists</a>
       <a href="youtube.html">YouTube Music</a>
       <a href="apple.html">Apple Music</a>
       <a href="#" id="logout-link" class="secondary">Logout</a>
@@ -80,10 +80,36 @@
         </svg>
       </button>
     </nav>
+
     <div class="container">
-      <h1>Spotify Playlists</h1>
-      <div id="playlist-list"></div>
+      <h1>Pomodoro Timer</h1>
+      <p id="phase-label" class="phase-label">Work Time</p>
+      <p id="timer-display" class="timer-display">25:00</p>
+
+      <div class="form-group">
+        <!-- hidden native select -->
+        <select id="playlist-dropdown" hidden>
+          <option value="" disabled selected>Select Playlist</option>
+        </select>
+
+        <!-- custom picker -->
+        <div id="playlist-picker" class="playlist-cards-container">
+          <!-- JS will inject .playlist-card items here -->
+        </div>
+      </div>
+
+      <div class="pomodoro-controls">
+        <b>
+          <button id="start-25-5" class="play">25 min / 5 min</button>
+          <button id="start-40-10" class="play">40 min / 10 min</button>
+          <button id="stop-timer" class="stop">Stop Timer</button>
+        </b>
+      </div>
     </div>
+
+    <!-- Container for embedded player/status -->
+    <div id="player-container"></div>
+
     <script src="js/app.js"></script>
     <script src="js/pomodoro.js"></script>
   </body>

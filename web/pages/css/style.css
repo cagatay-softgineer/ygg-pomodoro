@@ -10,11 +10,28 @@
   --accent: 210 40% 96.1%;
   --accent-fg: 222.2 47.4% 11.2%;
 
+  --hovered-accent: 155 40% 88.8%;
+  --hovered-accent-fg: 155 40% 11.2%;
+
+  --selected-accent: 155 40% 50%;
+  --selected-accent-fg: 155 100% 98%;
+
   --radius: 0.5rem;
   --shadow-color: rgba(0, 0, 0, 0.1);
 
   --transition-fast: 0.2s ease;
   --transition-slow: 0.3s ease;
+
+  --play: 155 40% 50%;
+  --play-fg: 210 40% 98%;
+
+  --stop: 0 100% 50%;
+  --stop-fg: 210 40% 98%;
+  
+  --logout: 0 100% 50%;
+  --logout-fg: 210 40% 98%;
+
+  --bar-color: rgba(77, 179, 136, 1);
 }
 
 /* Dark theme overrides */
@@ -25,6 +42,25 @@
   --primary-fg: 210 40% 98%;
   --accent: 217.2 32.6% 17.5%;
   --accent-fg: 210 40% 98%;
+
+  --hovered-accent: 12 40% 88.8%;
+  --hovered-accent-fg: 12 40% 11.2%;
+
+  --selected-accent: 12 100% 50%;
+  --selected-accent-fg: 12 40% 98%;
+
+  --shadow-color: rgba(255, 255, 255, 0.1);
+
+  --play: 217.2 32.6% 17.5%;
+  --play-fg: 210 40% 98%;
+
+  --logout: 0 100% 50%;
+  --logout-fg: 210 40% 98%;
+
+  --stop: 0 100% 50%;
+  --stop-fg: 210 40% 98%;
+
+  --bar-color: rgba(240, 48, 0, 1);
 }
 
 /*─────────────────────────────────────────────────────────────────────────
@@ -39,41 +75,109 @@
 }
 
 html {
-  font-size: 16px;
+  font-size: 14px;
 }
 
 body {
   font-family: Montserrat, sans-serif;
   background-color: hsl(var(--bg));
   color:            hsl(var(--fg));
-  line-height: 1.5;
+  line-height: 1;
   min-height: 100vh;
   transition: background-color var(--transition-slow),
               color var(--transition-slow);
 }
 
 a {
-  color: hsl(var(--primary));
   text-decoration: none;
   transition: color var(--transition-fast);
+  font-size: 1rem;
+  transition: border-color var(--transition-fast),
+              background-color var(--transition-fast);
+  color:            hsl(var(--accent-fg));
+  cursor: pointer;
 }
 a:hover {
   color: hsl(var(--primary) / 0.8);
+}
+a.active {
+  color: hsl(var(--primary) / 0.8);
+}
+
+
+/*─────────────────────────────────────────────────────────────────────────
+  Landing page styles
+─────────────────────────────────────────────────────────────────────────*/
+
+.landing-header {
+  text-align: right;
+  padding: 4rem 1rem;
+}
+.landing-header h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+.landing-header p {
+  font-size: 1.25rem;
+  color: var(--text-muted, #666);
+  margin-bottom: 2rem;
+}
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px,4fr));
+  gap: 2rem;
+  padding: 2rem 1rem;
+}
+.feature {
+  text-align: center;
+}
+.feature h2 {
+  margin-bottom: 0.5rem;
+}
+
+.landing-footer {
+  text-align: center;
+  padding: 1rem;
+  color: var(--text-muted, #666);
+}
+
+.landing-actions {
+  margin-top: 2rem;
+  display: grid;
+  justify-content: center;
+  gap: 0rem;
 }
 
 /*─────────────────────────────────────────────────────────────────────────
   Layout Containers
 ─────────────────────────────────────────────────────────────────────────*/
 .container {
-  max-width: 400px;
+  max-width: 70vw;
+  margin: 3rem auto;
+  padding: 1rem;
+  margin-bottom: 10rem;
+  background-color: hsl(var(--bg));
+  border-radius: var(--radius);
+  box-shadow: 0 2px 8px var(--shadow-color);
+  transition: background-color var(--transition-slow),
+              color var(--transition-slow);
+}
+.container:hover {
+  box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.form-container {
+  max-width: 40vw;
   margin: 3rem auto;
   padding: 1rem;
   background-color: hsl(var(--bg));
   border-radius: var(--radius);
   box-shadow: 0 2px 8px var(--shadow-color);
-  transition: box-shadow var(--transition-fast);
+    transition: background-color var(--transition-slow),
+              color var(--transition-slow);
 }
-.container:hover {
+.form-container:hover {
   box-shadow: 0 4px 12px var(--shadow-color);
 }
 
@@ -81,24 +185,46 @@ a:hover {
   Navigation
 ─────────────────────────────────────────────────────────────────────────*/
 nav {
-  text-align: center;
+  display: flex;
+  align-items: center;
+  /* option A: space-between */
+  justify-content: space-between;
   margin: 1rem 0;
+  padding: 0 1rem;
+  transition: background-color var(--transition-slow),
+            color var(--transition-slow);
 }
+
 nav a {
   margin: 0 0.5rem;
   font-weight: 500;
 }
-#theme-toggle {
-  margin-left: 1rem;
-  font-size: 0.9rem;
+
+/* Theme-toggle specific */
+.theme-toggle-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  margin-left: auto;  /* if you chose justify-content:flex-start above */
 }
+
+.theme-toggle-btn .icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  display: block;
+}
+
+/* icon swap logic */
+.theme-toggle-btn .sun-icon { display: none; }
+.dark .theme-toggle-btn .moon-icon { display: none; }
+.dark .theme-toggle-btn .sun-icon  { display: block; }
 
 /*─────────────────────────────────────────────────────────────────────────
   Forms & Inputs
 ─────────────────────────────────────────────────────────────────────────*/
 input,
-select,
-button:not(.play-btn) {
+select{
   width: 100%;
   padding: 0.75rem;
   margin: 0.5rem 0;
@@ -120,24 +246,97 @@ select:focus {
 /*─────────────────────────────────────────────────────────────────────────
   Buttons
 ─────────────────────────────────────────────────────────────────────────*/
-button:not(.play-btn) {
-  border: none;
+button:not(.play-btn, .register) {
+  width: 110vm;
+  padding: 0.75rem;
+  margin: 0.5rem 0;
+  border: 1px solid hsl(var(--accent-fg));
+  border-radius: var(--radius);
+  font-size: 1rem;
+  transition: border-color var(--transition-fast),
+              background-color var(--transition-fast);
   background-color: hsl(var(--primary));
   color:            hsl(var(--primary-fg));
   cursor: pointer;
-  transition: background-color var(--transition-fast),
-              transform var(--transition-fast);
 }
-button:not(.play-btn):hover {
+button:not(.play-btn, .register):hover {
   background-color: hsl(var(--primary) / 0.9);
 }
-button:not(.play-btn):active {
+button:not(.play-btn, .register):active {
+  transform: scale(0.98);
+  background-color: hsl(var(--primary) / 0.9);
+}
+
+button.secondary:not(.play-btn, .register) {
+  background-color: hsl(var(--accent));
+  color:            hsl(var(--accent-fg));
+}
+
+button.stop:not(.play-btn, .register) {
+  background-color: hsl(var(--stop));
+  color:            hsl(var(--stop-fg));
+}
+
+button.play:not(.play-btn, .register) {
+  background-color: hsl(var(--play));
+  color:            hsl(var(--play-fg));
+}
+
+button:hover{
+  transform:   scale(1.01);
+  box-shadow:  0 4px 12px rgba(0,0,0,0.15);
+}
+
+.login{
+  width: 100%;
+  padding: 0.75rem;
+  margin: 0.5rem 0;
+  border: 1px solid hsl(var(--accent));
+  border-radius: var(--radius);
+  font-size: 1rem;
+  transition: border-color var(--transition-fast),
+              background-color var(--transition-fast);
+  background-color: hsl(var(--primary));
+  color:            hsl(var(--primary-fg));
+  cursor: pointer;
+}
+
+.login:hover {
+  background-color: hsl(var(--primary-fg) / 0.9);
+}
+.login:active {
   transform: scale(0.98);
 }
 
-button.secondary:not(.play-btn) {
+.login.secondary {
   background-color: hsl(var(--accent));
   color:            hsl(var(--accent-fg));
+}
+
+.register{
+  width: 100%;
+  padding: 0.75rem;
+  margin: 0.5rem 0;
+  border: 1px solid hsl(var(--accent));
+  border-radius: var(--radius);
+  font-size: 1rem;
+  transition: border-color var(--transition-fast),
+              background-color var(--transition-fast);
+  background-color: hsl(var(--primary-fg));
+  color:            hsl(var(--primary));
+  cursor: pointer;
+}
+
+.register:hover {
+  background-color: hsl(var(--primary-fg) / 0.9);
+}
+.register:active {
+  transform: scale(0.98);
+}
+
+.register.secondary {
+  background-color: hsl(var(--accent-fg));
+  color:            hsl(var(--accent));
 }
 
 /*─────────────────────────────────────────────────────────────────────────
@@ -215,6 +414,94 @@ button.secondary:not(.play-btn) {
   box-shadow: 0 0 0 3px hsl(var(--primary-fg));
 }
 
+
+/* ─── Fixed player bar ───────────────────────────────────────── */
+#current-player {
+  position: fixed;
+  bottom: 0; left: 0;
+  width: 100%;
+  background: var(--bg, #222);
+  color: var(--fg, #eee);
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  box-shadow: 0 -2px 6px var(--shadow-color);
+  font-family: sans-serif;
+  backdrop-filter: blur(20px);
+  z-index: 1000;
+}
+
+#current-player.hidden {
+  display: none;
+}
+
+/* album art */
+#cp-cover {
+  width: 56px;
+  height: 56px;
+  border-radius: 4px;
+  object-fit: cover;
+  margin-right: 1rem;
+}
+
+/* track info */
+.cp-info {
+  flex: 1;
+  overflow: hidden;
+}
+
+.cp-title {
+  font-size: 1rem;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cp-sub {
+  font-size: 0.875rem;
+  color: var(--text-muted, #aaa);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* progress bar */
+/* Playback progress row */
+.cp-progress {
+  display: flex;
+  align-items: center;
+  flex: 1;            /* take remaining space in the player bar */
+  min-width: 0;       /* allow it to shrink below its content size */
+}
+
+/* time stamps on each end */
+.cp-time {
+  font-size: 0.75rem;
+  width: 2.5rem;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* the track container */
+.cp-bar {
+  flex: 1;                /* fill all extra space between the times */
+  height: 4px;
+  background: var(--text, #444);   /* fallback to #444 if --play not set */
+  border-radius: 2px;
+  margin: 0 0.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* the fill element */
+.cp-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--bar-color, #1db954); /* fallback to Spotify green */
+  transition: width 0.3s ease;
+  will-change: width;
+}
 /*─────────────────────────────────────────────────────────────────────────
   Pomodoro Timer
 ─────────────────────────────────────────────────────────────────────────*/
@@ -232,6 +519,92 @@ button.secondary:not(.play-btn) {
   margin: 0 0.5rem;
 }
 
+/* Pomodoro timer styles */
+.phase-label {
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.timer-display {
+  text-align: center;
+  font-size: 3rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.pomodoro-controls button {
+  width: 100%;
+  margin-bottom: 0.75rem;
+}
+
+/* container grid */
+.playlist-cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+/* each card */
+.playlist-card {
+  background-color: hsl(var(--accent));
+  color: hsl(var(--accent-fg));
+  border-radius: 8px;
+  padding: 0.75rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.playlist-card img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+
+.playlist-card h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+}
+
+.playlist-card p {
+  margin: 0.25rem 0 0;
+  font-size: 0.75rem;
+  color: var(--text-muted, #666);
+  text-align: center;
+}
+
+/* hover & selected states */
+.playlist-card:hover{
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  background-color: hsl(var(--hovered-accent));
+  color:            hsl(var(--hovered-accent-fg));
+}
+
+.playlist-card.selected{
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  background-color: hsl(var(--selected-accent));
+  color:            hsl(var(--selected-accent-fg));
+}
+
 /*─────────────────────────────────────────────────────────────────────────
   Utility Classes
 ─────────────────────────────────────────────────────────────────────────*/
@@ -239,3 +612,106 @@ button.secondary:not(.play-btn) {
 .text-app { color:             hsl(var(--fg));    }
 .rounded-app { border-radius: var(--radius);      }
 .shadow-app  { box-shadow:    0 2px 8px var(--shadow-color); }
+
+
+
+/*─────────────────────────────────────────────────────────────────────────
+  Responsive Breakpoints
+─────────────────────────────────────────────────────────────────────────*/
+
+/* Mobile phones (up to 600px) */
+@media (max-width: 600px) {
+
+  /* Containers fill almost full width */
+  .container,
+  .form-container {
+    max-width: 95vw;
+    margin: 1rem auto;
+    padding: 0.75rem;
+  }
+
+  /* Nav becomes vertical / centered */
+  nav {
+    flex-direction: column;
+    gap: 0.5rem;
+    justify-content: center;
+  }
+
+  nav a {
+    font-size: 0.9rem;
+  }
+
+  /* Hero: smaller padding & font sizes */
+  .landing-header {
+    padding: 2rem 1rem;
+    text-align: center;
+  }
+  .landing-header h1 { font-size: 2rem; }
+  .landing-header p  { font-size: 1rem; }
+
+  /* Action buttons stack */
+  .landing-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  /* Feature grid becomes single column */
+  .features {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+  }
+
+  /* Player bar stacks */
+  #current-player {
+    flex-direction: column;
+    align-items: flex-start;
+    row-gap: 0.5rem;
+  }
+  .cp-progress {
+    width: 100%;
+  }
+}
+
+/* Tablets (601px to 1024px) */
+@media (min-width: 601px) and (max-width: 1024px) {
+
+  /* Slightly narrower containers */
+  .container,
+  .form-container {
+    max-width: 85vw;
+  }
+
+  /* Features as two columns if space allows */
+  .features {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+
+  /* Slightly larger base font */
+  html { font-size: 15px; }
+}
+
+/* Desktops (1025px and up) */
+@media (min-width: 1025px) {
+
+  /* Original container width */
+  .container,
+  .form-container {
+    max-width: 70vw;
+  }
+
+  /* Nav spreads out with space-between */
+  nav {
+    justify-content: space-between;
+    padding: 0 2rem;
+  }
+
+  /* Feature grid three columns */
+  .features {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    padding: 2rem 2rem;
+  }
+
+  /* Restore base font */
+  html { font-size: 16px; }
+}

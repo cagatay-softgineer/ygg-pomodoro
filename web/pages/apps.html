@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Connect Music Apps</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <script>
+      (function () {
+        // restore saved theme
+        const theme = localStorage.getItem("theme");
+        if (theme === "dark") {
+          document.documentElement.classList.add("dark");
+        }
+      })();
+    </script>
+    <style>
+      /* simple inline tweaks—move to your CSS if you prefer */
+      #app-link-section {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+      }
+      .app-card {
+        width: 160px;
+        padding: 1rem;
+        border-radius: var(--radius);
+        box-shadow: 0 2px 6px var(--shadow-color);
+        text-align: center;
+        background-color: var(--accent);
+        color: var(--accent-fg);
+      }
+      .app-card img {
+        width: 64px;
+        height: 64px;
+        margin-bottom: 0.5rem;
+      }
+      .app-card button {
+        margin-top: 0.5rem;
+      }
+    </style>
+  </head>
+  <body id="app-body" class="bg-app text-app">
+    <div id="current-player" class="hidden">
+      <img id="cp-cover" src="" alt="Album art" />
+      <div class="cp-info">
+        <div id="cp-title" class="cp-title">Track Name</div>
+        <div id="cp-artist" class="cp-sub">Artist Name</div>
+        <div id="cp-album" class="cp-sub">Album Name</div>
+      </div>
+      <div class="cp-progress">
+        <span id="cp-time-elapsed" class="cp-time">0:00</span>
+        <div class="cp-bar">
+          <div id="cp-bar-fill" class="cp-bar-fill"></div>
+        </div>
+        <span id="cp-duration" class="cp-time">0:00</span>
+      </div>
+    </div>
+    <nav class="container nav-bar" style="text-align: center">
+      <a href="home.html">Home</a>
+      <a href="pomodoro.html">Pomodoro</a>
+      <a href="apps.html" class="active">Apps</a>
+      <a href="spotify.html">Spotify</a>
+      <a href="playlists.html">Spotify Playlists</a>
+      <a href="youtube.html">YouTube Music</a>
+      <a href="apple.html">Apple Music</a>
+      <a href="#" id="logout-link" class="secondary">Logout</a>
+      <button
+        id="theme-toggle"
+        class="theme-toggle-btn"
+        aria-label="Toggle theme"
+      >
+        <svg
+          class="icon moon-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z" />
+        </svg>
+        <svg
+          class="icon sun-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <circle cx="12" cy="12" r="5" />
+          <line x1="12" y1="1" x2="12" y2="3" />
+          <line x1="12" y1="21" x2="12" y2="23" />
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+          <line x1="1" y1="12" x2="3" y2="12" />
+          <line x1="21" y1="12" x2="23" y2="12" />
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+        </svg>
+      </button>
+    </nav>
+
+    <div class="container">
+      <h1>Connect Your Music Apps</h1>
+      <div id="app-link-section">
+        <!-- Spotify -->
+        <div class="playlist-card" data-app="Spotify">
+          <img
+            style="height: 100px; width: 100px"
+            src="https://cdn.svgporn.com/logos/spotify-icon.svg"
+            alt="Spotify Logo"
+          />
+          <h2>Spotify</h2>
+          <div class="app-status" id="status-spotify"></div>
+          <button id="link-spotify-btn">Link Spotify</button>
+        </div>
+
+        <!-- YouTube Music -->
+        <div class="playlist-card" data-app="YoutubeMusic">
+          <img
+            style="height: 100px; width: 100px"
+            src="data:image/png;base64,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"
+            alt="YouTube Music Logo"
+          />
+          <h2>YouTube Music</h2>
+          <div class="app-status" id="status-youtube"></div>
+          <button id="link-youtube-btn">Link YouTube</button>
+        </div>
+
+        <!-- Apple Music -->
+        <div class="playlist-card" data-app="AppleMusic">
+          <img
+            style="height: 100px; width: 100px"
+            src="https://toolbox.marketingtools.apple.com/_next/static/media/music.159ea19e.svg"
+            alt="Apple Music Logo"
+          />
+          <h2>Apple Music</h2>
+          <div class="app-status" id="status-apple"></div>
+          <button id="link-apple-btn">Link Apple Music</button>
+        </div>
+      </div>
+    </div>
+    <script src="js/app.js"></script>
+    <script src="js/pomodoro.js"></script>
+  </body>
+</html>

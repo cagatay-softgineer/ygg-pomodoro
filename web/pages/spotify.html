@@ -17,10 +17,68 @@
     </script>
   </head>
   <body id="app-body" class="bg-app text-app">
-    <nav style="text-align: center; margin: 1rem 0">
+    <div id="current-player" class="hidden">
+      <img id="cp-cover" src="" alt="Album art" />
+      <div class="cp-info">
+        <div id="cp-title" class="cp-title">Track Name</div>
+        <div id="cp-artist" class="cp-sub">Artist Name</div>
+        <div id="cp-album" class="cp-sub">Album Name</div>
+      </div>
+      <div class="cp-progress">
+        <span id="cp-time-elapsed" class="cp-time">0:00</span>
+        <div class="cp-bar">
+          <div id="cp-bar-fill" class="cp-bar-fill"></div>
+        </div>
+        <span id="cp-duration" class="cp-time">0:00</span>
+      </div>
+    </div>
+    <nav class="container nav-bar" style="text-align: center;">
       <a href="home.html">Home</a>
-      <a href="playlists.html">Playlists</a>
-      <button id="theme-toggle">Toggle Dark Mode</button>
+      <a href="pomodoro.html">Pomodoro</a>
+      <a href="apps.html">Apps</a>
+      <a href="spotify.html" class="active">Spotify</a>
+      <a href="playlists.html">Spotify Playlists</a>
+      <a href="youtube.html">YouTube Music</a>
+      <a href="apple.html">Apple Music</a>
+      <a href="#" id="logout-link" class="secondary">Logout</a>
+      <button
+        id="theme-toggle"
+        class="theme-toggle-btn"
+        aria-label="Toggle theme"
+      >
+        <!-- moon = shown in light theme -->
+        <svg
+          class="icon moon-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z" />
+        </svg>
+        <!-- sun = shown in dark theme -->
+        <svg
+          class="icon sun-icon"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <circle cx="12" cy="12" r="5" />
+          <line x1="12" y1="1" x2="12" y2="3" />
+          <line x1="12" y1="21" x2="12" y2="23" />
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+          <line x1="1" y1="12" x2="3" y2="12" />
+          <line x1="21" y1="12" x2="23" y2="12" />
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+        </svg>
+      </button>
     </nav>
     <div class="container">
       <h1>Spotify Account</h1>
@@ -30,5 +88,6 @@
       <div id="spotify-profile" style="margin-top: 1.5rem"></div>
     </div>
     <script src="js/app.js"></script>
+    <script src="js/pomodoro.js"></script>
   </body>
 </html>
