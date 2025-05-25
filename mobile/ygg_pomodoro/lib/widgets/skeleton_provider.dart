@@ -137,6 +137,55 @@ class SkeletonImage extends StatelessWidget {
   }
 }
 
+class SkeletonText extends StatelessWidget {
+  /// The actual text to display when not loading.
+  final String text;
+
+  /// Styling for the text (also used to size the placeholder).
+  final TextStyle? style;
+
+  /// Maximum width for the placeholder. If null, falls back to full width.
+  final double? width;
+
+  /// Radius for rounding the placeholder’s corners.
+  final BorderRadius borderRadius;
+
+  const SkeletonText({
+    Key? key,
+    required this.text,
+    this.style,
+    this.width,
+    this.borderRadius = const BorderRadius.all(Radius.circular(4)),
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final prov = SkeletonProvider.of(context);
+    if (prov.isLoading) {
+      // Approximate text height from style, defaulting to 16 if unspecified
+      final placeholderHeight = style?.fontSize ?? 16.0;
+      return Shimmer.fromColors(
+        baseColor: prov.baseColor,
+        highlightColor: prov.highlightColor,
+        period: prov.period,
+        child: Container(
+          width: width ?? double.infinity,
+          height: placeholderHeight * 1.2, // add a bit of vertical padding
+          decoration: BoxDecoration(
+            color: prov.baseColor,
+            borderRadius: borderRadius,
+          ),
+        ),
+      );
+    } else {
+      return Text(
+        text,
+        style: style,
+      );
+    }
+  }
+}
+
 // SkeletonProvider(
 //  isLoading: _isLoading,
 //  baseColor: ColorPalette.lightGray,

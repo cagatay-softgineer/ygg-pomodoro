@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 from flask_cors import CORS
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from util.logit import get_logger
@@ -23,7 +23,7 @@ def profile_healthcheck():
     return jsonify({"status": "ok", "service": "Profile Service"}), 200
 
 
-@profile_bp.route("/view", methods=["GET"])
+@profile_bp.route("/view", methods=["POST"])
 @jwt_required()
 @requires_scope("me")
 def view_profile():
@@ -48,23 +48,52 @@ def view_profile():
     }
     """
     current_user = get_jwt_identity()
-    # print(current_user)
+    print(current_user)
 
     user_id = firebase_operations.get_user_id_by_email(current_user)
 
+    print(user_id)
+
     rows = firebase_operations.get_user_profile(user_id)
-    # print(rows)
-    if rows[0] != []:
-        user = rows[0]
-        return (
-            jsonify(
-                {
-                    "first_name": user["first_name"],
-                    "last_name": user["last_name"],
-                    "avatar_url": user["avatar_url"],
-                    "bio": user["bio"],
-                }
-            ),
-            200,
-        )
-    return jsonify({"error": "User not found"}), 404
+    print(rows)
+    try:
+        if rows[0] != []:
+            user = rows[0]
+            return (
+                jsonify(
+                    {
+                        "first_name": user["first_name"],
+                        "last_name": user["last_name"],
+                        "avatar_url": user["avatar_url"],
+                        "bio": user["bio"],
+                    }
+                ),
+                200,
+            )
+        return jsonify({"error": "User not found"}), 404
+    except Exception as e:
+        logger.error("An error occurred while fetching user profile.", e)()
+        return jsonify({"error": "An error occurred while fetching user profile."}), 404
+
+
+@profile_bp.route('/chain_status', methods=['POST'])
+@jwt_required()
+@requires_scope("me")
+def get_current_user_chain_status():
+    current_user = get_jwt_identity()
+    user_id = firebase_operations.get_user_id_by_email(current_user)
+    chain_status = firebase_operations.get_user_chain_status(user_id)
+    if chain_status:
+        return jsonify(chain_status), 200
+    return jsonify({"error": "Chain not found"}), 404
+
+@profile_bp.route('/chain_status_update', methods=['POST'])
+@jwt_required()
+@requires_scope("me")
+def update_user_chain_status():
+    current_user = get_jwt_identity()
+    user_id = firebase_operations.get_user_id_by_email(current_user)
+    data = request.get_json()
+    # e.g. data = { "action": "completed" }
+    result = firebase_operations.upsert_user_chain(user_id, data)
+    return jsonify(result), 200

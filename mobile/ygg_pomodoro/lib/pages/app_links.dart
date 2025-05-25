@@ -1,7 +1,7 @@
-import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:ygg_pomodoro/pages/home_page.dart';
+import 'package:ygg_pomodoro/pages/navigation_page.dart';
 import 'package:ygg_pomodoro/providers/appsSession.dart';
 import 'package:ygg_pomodoro/providers/userSession.dart';
 import 'package:ygg_pomodoro/styles/button_styles.dart';
@@ -25,7 +25,7 @@ class AppLinkPage extends StatefulWidget {
 class AppLinkPageState extends State<AppLinkPage> with WidgetsBindingObserver {
   // Define a list of apps with initial configurations.
 
-  HomePageState homepage = HomePageState();
+  HomePageBody homepage = HomePageBody();
 
   final List<LinkedApp> linkedApps = [
     LinkedApp(
@@ -103,22 +103,22 @@ class AppLinkPageState extends State<AppLinkPage> with WidgetsBindingObserver {
                   profile['images'].isNotEmpty) {
                 app.userPic =
                     profile['images'][0]['url'] ??
-                    UserConstants.defaultAvatarUrl;
+                    UserSession.userPIC ?? UserConstants.defaultAvatarUrl;
               } else {
-                app.userPic = UserConstants.defaultAvatarUrl;
+                app.userPic = UserSession.userPIC ?? UserConstants.defaultAvatarUrl;;
               }
             } else if (app.name == "YoutubeMusic") {
               app.userDisplayName = profile['name'] ?? "No Display Name";
               app.userPic =
-                  profile['picture'] ?? UserConstants.defaultAvatarUrl;
+                  profile['picture'] ?? UserSession.userPIC ?? UserConstants.defaultAvatarUrl;;
             } else {
               app.userDisplayName = profile['name'] ?? "No Display Name";
               app.userPic =
-                  profile['picture'] ?? UserConstants.defaultAvatarUrl;
+                  profile['picture'] ?? UserSession.userPIC ?? UserConstants.defaultAvatarUrl;;
             }
           } else {
             app.userDisplayName = "User Not Linked";
-            app.userPic = UserConstants.defaultAvatarUrl;
+            app.userPic = UserSession.userPIC ?? UserConstants.defaultAvatarUrl;
           }
         }
       }
@@ -152,8 +152,9 @@ class AppLinkPageState extends State<AppLinkPage> with WidgetsBindingObserver {
                               UserSession.userPIC ??
                               UserConstants.defaultAvatarUrl,
                           userName: UserSession.userNAME ?? "",
-                          chainPoints: 0,
+                          chainPoints: UserSession.currentChainStreak ?? 0,
                           storePoints: 0,
+                          onChainTap: () => NavigationPage.of(context).showChain(),
                         ),
                         SizedBox(height: 50),
                         Container(

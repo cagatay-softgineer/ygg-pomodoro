@@ -182,6 +182,7 @@ class _CustomPlayerWidgetState extends State<CustomPlayerWidget> {
         repeatMode: _currentRepeatMode,
         shuffleMode: _currentShuffleMode,
         isDynamic: false,
+        currentApp: widget.app,
         onPlayPausePressed: () async {
           final response = await spotifyAPI.getDevices(widget.userID);
           final String deviceId = extractFirstDeviceId(response);

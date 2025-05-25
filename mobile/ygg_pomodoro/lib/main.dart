@@ -2,24 +2,30 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 // ignore: library_prefixes
 import 'package:app_links/app_links.dart' as deepLink;
+import 'package:showcaseview/showcaseview.dart';
 import 'package:ygg_pomodoro/enums/enums.dart';
+import 'package:ygg_pomodoro/pages/chain_page.dart';
+import 'package:ygg_pomodoro/pages/navigation_page.dart';
 import 'package:ygg_pomodoro/services/main_api.dart';
 import 'package:ygg_pomodoro/styles/color_palette.dart';
-import 'package:ygg_pomodoro/widgets/custom_button.dart';
-import 'package:ygg_pomodoro/styles/button_styles.dart';
 import 'package:ygg_pomodoro/pages/timer_page.dart';
 import 'package:ygg_pomodoro/pages/custom_timer_page.dart';
-import 'package:ygg_pomodoro/pages/widgets_page.dart';
-import 'package:ygg_pomodoro/pages/login_page.dart';
-import 'package:ygg_pomodoro/pages/register_page.dart';
-import 'package:ygg_pomodoro/pages/home_page.dart';
 import 'package:ygg_pomodoro/pages/app_links.dart';
 import 'package:ygg_pomodoro/pages/playlist_page.dart';
 import 'package:ygg_pomodoro/pages/player_control_page.dart';
 import 'package:ygg_pomodoro/widgets/skeleton_provider.dart';
+import 'package:ygg_pomodoro/widgets/view/login_widget.dart';
+import 'package:ygg_pomodoro/pages/widgets_page.dart';
+
+// import 'package:ygg_pomodoro/pages/login_page.dart';
+// import 'package:ygg_pomodoro/pages/register_page.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ShowCaseWidget(
+      builder: (context) => MyApp(),
+      ),
+  );
 }
 
 // Global navigator key for navigation from deep link callbacks.
@@ -101,132 +107,99 @@ class _MyAppState extends State<MyApp> {
       home:
           _isLoading
               ? SkeletonProvider(
-                  isLoading: _isLoading,
-                  baseColor: ColorPalette.lightGray,
-                  highlightColor: ColorPalette.gold,
-                  child: Scaffold(
-                    appBar: AppBar(title: Text('Home Page', style: TextStyle(color: Youtube.white)), backgroundColor: ColorPalette.backgroundColor),
+                isLoading: _isLoading,
+                baseColor: ColorPalette.lightGray,
+                highlightColor: ColorPalette.gold,
+                child: Scaffold(
+                  appBar: AppBar(
+                    title: Text('', style: TextStyle(color: Youtube.white)),
                     backgroundColor: ColorPalette.backgroundColor,
-                    body: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        children: [
-                          // form field placeholder
-                          const SizedBox(height: 200),
+                  ),
+                  backgroundColor: ColorPalette.backgroundColor,
+                  body: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        // form field placeholder
+                        const SizedBox(height: 10),
 
-                          const SkeletonTextField(decoration: InputDecoration(hintText: 'Name')),
-  
-                          const SizedBox(height: 50),
-  
-                          // another form field
-                          const SkeletonTextField(decoration: InputDecoration(hintText: 'Email')),
-  
-                          const SizedBox(height: 150),
-  
-                          // submit button placeholder
-                          SkeletonButton(
-                            child: const Text('Submit'),
-                            width: 200,
-                            onPressed: () {}, // will be ignored during loading
+                        const SkeletonImage(
+                          width: 200,
+                          height: 200,
+                          image: NetworkImage(
+                            "https://raw.githubusercontent.com/Yggbranch/assets/refs/heads/main/Aurevia/PNG/Asset%201_1.png",
                           ),
-                        ],
-                      ),
+                        ),
+
+                        const SizedBox(height: 30),
+
+                        const SkeletonText(
+                          text: "Aurevia",
+                          width: 200,
+                          style: TextStyle(fontSize: 48),
+                        ),
+
+                        const SizedBox(height: 30),
+
+                        const SkeletonText(text: "Email", width: 50),
+
+                        const SizedBox(height: 20),
+
+                        const SkeletonTextField(
+                          decoration: InputDecoration(hintText: 'Email'),
+                        ),
+
+                        const SizedBox(height: 30),
+
+                        const SkeletonText(text: "Password", width: 50),
+
+                        const SizedBox(height: 20),
+
+                        // another form field
+                        const SkeletonTextField(
+                          decoration: InputDecoration(hintText: 'Password'),
+                        ),
+
+                        const SizedBox(height: 30),
+
+                        const SkeletonText(
+                          text: "Don't Have An Account",
+                          width: 150,
+                          style: TextStyle(fontSize: 16),
+                        ),
+
+                        const SizedBox(height: 50),
+
+                        const SizedBox(height: 50),
+
+                        // submit button placeholder
+                        SkeletonButton(
+                          width: 200,
+                          onPressed: () {}, // will be ignored during loading
+                          child: const Text('Login'),
+                        ),
+                      ],
                     ),
                   ),
-                )
-
-
-                // SkeletonFormPage(
-                //   formFieldCount: 2,
-                //   formFieldWidths: [0.8, 0.8],
-                //   formFieldHeight: 78,
-                //   formFieldSpacing: 40,
-                //   formButtonCount: 1,
-                //   formButtonWidths: [0.5],
-                //   appBar: AppBar(title: Align(alignment: Alignment.center, child:  Text('Welcome Aboard'))),
-                // )
+                ),
+              )
               : StartPage(),
       routes: {
-        '/login_page': (context) => LoginPage(),
-        '/main': (context) => HomePage(),
+        // '/login_page': (context) => LoginPage(), Added Into Start Page
+        // '/main': (context) => HomePage(),
+        '/main': (context) => NavigationPage(),
+
         '/applinks': (context) => AppLinkPage(),
-        '/register_page': (context) => RegisterPage(),
+        // '/register_page': (context) => RegisterPage(), Added Into Start Page
         '/playlists': (context) => PlaylistPage(),
         '/player':
             (context) => PlayerControlPage(selectedApp: MusicApp.Spotify),
         '/timer': (context) => TimerPage(),
         '/custom_timer': (context) => CustomTimerPage(),
         '/widget_page': (context) => WidgetShowroomPage(),
+        '/chain_page': (context) => ChainPage(onBack: () {NavigationPage.of(context).hideChain();},),
       },
     );
   }
 }
 
-class StartPage extends StatelessWidget {
-  const StartPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Home Page')),
-      body: Stack(
-        children: [
-          //Align(
-          //  alignment: Alignment.topCenter,
-          //  child: Padding(
-          //    padding: const EdgeInsets.only(top: 50.0),
-          //    child:
-          //    CustomButton(
-          //      text: "Button Customizer",
-          //      onPressed: () {
-          //        Navigator.pushNamed(context, '/button_customizer');
-          //      },
-          //      buttonParams: mainButtonParams,
-          //    ),
-          //  ),
-          //),
-          Align(
-            alignment: Alignment.topCenter,
-            child: Padding(
-              padding: const EdgeInsets.only(top: 50.0),
-              child: CustomButton(
-                text: "Login Page",
-                onPressed: () {
-                  Navigator.pushNamed(context, '/login_page');
-                },
-                buttonParams: mainButtonParams,
-              ),
-            ),
-          ),
-          Align(
-            alignment: Alignment.topCenter,
-            child: Padding(
-              padding: const EdgeInsets.only(top: 200.0),
-              child: CustomButton(
-                text: "Register Page",
-                onPressed: () {
-                  Navigator.pushNamed(context, '/register_page');
-                },
-                buttonParams: mainButtonParams,
-              ),
-            ),
-          ),
-          Align(
-            alignment: Alignment.topCenter,
-            child: Padding(
-              padding: const EdgeInsets.only(top: 350.0),
-              child: CustomButton(
-                text: "Widget Page",
-                onPressed: () {
-                  Navigator.pushNamed(context, '/widget_page');
-                },
-                buttonParams: mainButtonParams,
-              ),
-            ),
-          ),
-          // Additional widgets can be added here.
-        ],
-      ),
-    );
-  }
-}
